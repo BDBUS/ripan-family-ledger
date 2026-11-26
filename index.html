@@ -91,8 +91,8 @@
             <i data-lucide="wallet-cards" class="w-5 h-5"></i>
           </div>
           <div class="truncate">
-            <h1 id="headerBrandTitle" class="text-sm sm:text-base font-bold text-slate-900 truncate">হিসাব নিকাশ</h1>
-            <p id="headerBrandSub" class="text-[11px] text-slate-500 truncate hidden sm:block">আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা</p>
+            <h1 id="headerBrandTitle" data-i18n="brand_title" class="text-sm sm:text-base font-bold text-slate-900 truncate">হিসাব নিকাশ</h1>
+            <p id="headerBrandSub" data-i18n="brand_sub" class="text-[11px] text-slate-500 truncate hidden sm:block">আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা</p>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@
       </div>
 
       <div class="mx-4 mt-4 p-3.5 rounded-2xl bg-slate-900 text-white shadow-sm">
-        <p id="drawerBalanceLabel" class="text-[11px] uppercase tracking-wider text-emerald-300/90 font-medium">বর্তমান একাউন্ট ব্যালেন্স</p>
+        <p id="drawerBalanceLabel" data-i18n="stat_balance" class="text-[11px] uppercase tracking-wider text-emerald-300/90 font-medium">বর্তমান একাউন্ট ব্যালেন্স</p>
         <p id="drawerBalanceValue" class="text-xl font-bold mt-0.5 tabular-nums text-white">৳০.০০</p>
       </div>
 
@@ -178,29 +178,63 @@
           </p>
 
           <div class="grid grid-cols-2 gap-2 mt-5 bg-black/15 p-1 rounded-xl">
-            <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="py-2 rounded-lg text-xs font-bold bg-white text-emerald-800 transition">
+            <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" data-i18n="tab_login" class="py-2 rounded-lg text-xs font-bold bg-white text-emerald-800 transition">
               লগইন
             </button>
-            <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="py-2 rounded-lg text-xs font-bold text-white/90 hover:bg-white/10 transition">
+            <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" data-i18n="tab_register" class="py-2 rounded-lg text-xs font-bold text-white/90 hover:bg-white/10 transition">
               রেজিস্ট্রেশন
             </button>
           </div>
         </div>
 
         <form id="authForm" onsubmit="handleAuthSubmit(event)" class="p-6 sm:p-8 space-y-4">
-          <div id="registerNameGroup" class="hidden">
-            <label for="authName" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-              <span>পূর্ণ নাম</span> <span class="text-rose-500">*</span>
-            </label>
-            <div class="relative">
-              <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-              <input id="authName" type="text" placeholder="আপনার নাম লিখুন" class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
+          <!-- REGISTRATION EXTRA FIELDS -->
+          <div id="registerFieldsGroup" class="hidden space-y-4">
+            <!-- Profile Photo (max 500KB) -->
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_photo">প্রোফাইল ছবি (সর্বোচ্চ ৫০০ KB)</span>
+              </label>
+              <div class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/70">
+                <img id="regPhotoPreview" src="https://placehold.co/96x96/059669/ffffff?text=US" alt="Preview" class="w-12 h-12 rounded-xl object-cover ring-2 ring-emerald-500/30 shrink-0" />
+                <div class="min-w-0 flex-1">
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-700 border border-slate-300 text-xs font-semibold">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    <span data-i18n="choose_photo">ছবি নির্বাচন করুন</span>
+                    <input id="regPhotoInput" type="file" accept="image/*" onchange="handleRegPhotoChange(event)" class="hidden" />
+                  </label>
+                  <p id="regPhotoHint" data-i18n="photo_limit_hint" class="text-[11px] text-slate-500 mt-1">সর্বোচ্চ সাইজ: 500 KB</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full Name -->
+            <div>
+              <label for="authName" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_fullname">পুরো নাম</span> <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input id="authName" type="text" data-i18n-ph="ph_fullname" placeholder="আপনার পুরো নাম লিখুন" class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
+              </div>
+            </div>
+
+            <!-- Username / Nickname -->
+            <div>
+              <label for="authUsername" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_username">ইউজারনেম / ডাকনাম</span> <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <i data-lucide="at-sign" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input id="authUsername" type="text" data-i18n-ph="ph_username" placeholder="ইউজারনেম বা ডাকনাম লিখুন" class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
+              </div>
             </div>
           </div>
 
+          <!-- Email Address -->
           <div>
             <label for="authEmail" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-              <span>ইমেইল ঠিকানা</span> <span class="text-rose-500">*</span>
+              <span data-i18n="reg_email">ইমেইল ঠিকানা</span> <span class="text-rose-500">*</span>
             </label>
             <div class="relative">
               <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
@@ -208,16 +242,102 @@
             </div>
           </div>
 
+          <!-- Mobile Number (Registration only) -->
+          <div id="registerMobileGroup" class="hidden">
+            <label for="authMobile" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+              <span data-i18n="reg_mobile">মোবাইল নম্বর</span> <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <i data-lucide="phone" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input id="authMobile" type="tel" data-i18n-ph="ph_mobile" placeholder="01XXXXXXXXX" class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
+            </div>
+          </div>
+
+          <!-- Password -->
           <div>
             <label for="authPassword" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-              <span>পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</span> <span class="text-rose-500">*</span>
+              <span data-i18n="reg_password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</span> <span class="text-rose-500">*</span>
             </label>
             <div class="relative">
               <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
               <input id="authPassword" type="password" required minlength="6" placeholder="••••••••" class="w-full pl-10 pr-11 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
-              <button type="button" onclick="togglePasswordVisibility()" class="p-1.5 text-slate-400 hover:text-slate-700 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg">
+              <button type="button" onclick="togglePasswordVisibility('authPassword', 'eyeIcon')" class="p-1.5 text-slate-400 hover:text-slate-700 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg">
                 <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
               </button>
+            </div>
+          </div>
+
+          <!-- Confirm Password & More Registration Fields -->
+          <div id="registerMoreGroup" class="hidden space-y-4">
+            <div>
+              <label for="authConfirmPassword" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_confirm_password">পাসওয়ার্ড পুনরায় লিখুন</span> <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <i data-lucide="lock-keyhole" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input id="authConfirmPassword" type="password" minlength="6" placeholder="••••••••" class="w-full pl-10 pr-11 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm" />
+                <button type="button" onclick="togglePasswordVisibility('authConfirmPassword', 'eyeConfirmIcon')" class="p-1.5 text-slate-400 hover:text-slate-700 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg">
+                  <i id="eyeConfirmIcon" data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="authDob" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                  <span data-i18n="reg_dob">জন্মতারিখ</span> <span class="text-rose-500">*</span>
+                </label>
+                <input id="authDob" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+              </div>
+
+              <div>
+                <label for="authGender" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                  <span data-i18n="reg_gender">লিঙ্গ</span> <span class="text-rose-500">*</span>
+                </label>
+                <select id="authGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                  <option value="" data-i18n="select_gender">নির্বাচন করুন</option>
+                  <option value="Male" data-i18n="gender_male">পুরুষ</option>
+                  <option value="Female" data-i18n="gender_female">মহিলা</option>
+                  <option value="Other" data-i18n="gender_other">অন্যান্য</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="authCountry" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_country">দেশ / অঞ্চল</span> <span class="text-rose-500">*</span>
+              </label>
+              <select id="authCountry" onchange="handleLocationDropdownChange('authCountry', 'authArea')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                <option value="Bangladesh" selected data-i18n="country_bd">বাংলাদেশ (Bangladesh)</option>
+                <option value="India" data-i18n="country_in">ভারত (India)</option>
+                <option value="Saudi Arabia" data-i18n="country_sa">সৌদি আরব (Saudi Arabia)</option>
+                <option value="United Arab Emirates" data-i18n="country_ae">সংযুক্ত আরব আমিরাত (UAE)</option>
+                <option value="Malaysia" data-i18n="country_my">মালয়েশিয়া (Malaysia)</option>
+                <option value="United Kingdom" data-i18n="country_uk">যুক্তরাজ্য (UK)</option>
+                <option value="United States" data-i18n="country_us">যুক্তরাষ্ট্র (USA)</option>
+                <option value="Other" data-i18n="country_other">অন্যান্য</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="authArea" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_area">বিভাগ / জেলা / শহর</span> <span class="text-rose-500">*</span>
+              </label>
+              <select id="authArea" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white"></select>
+            </div>
+
+            <div>
+              <label for="authAddress" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+                <span data-i18n="reg_address">বিস্তারিত ঠিকানা</span> <span class="text-rose-500">*</span>
+              </label>
+              <textarea id="authAddress" rows="2" data-i18n-ph="ph_address" placeholder="গ্রাম/মহল্লা, রোড, বাড়ি বা পোস্ট অফিস লিখুন" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
+            </div>
+
+            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+              <input id="authTerms" type="checkbox" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer" />
+              <label for="authTerms" data-i18n="reg_terms" class="text-xs text-slate-700 leading-relaxed cursor-pointer">
+                আমি শর্তাবলি ও গোপনীয়তা নীতি (Terms & Conditions / Privacy Policy) মেনে নিচ্ছি।
+              </label>
             </div>
           </div>
 
@@ -228,7 +348,7 @@
             <span id="authSubmitText">লগইন করুন</span>
           </button>
 
-          <p class="text-center text-[11px] text-slate-400">
+          <p data-i18n="auth_footer_note" class="text-center text-[11px] text-slate-400">
             লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না
           </p>
         </form>
@@ -324,11 +444,11 @@
               </div>
               <div>
                 <label for="depositReference" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_reference">রেফারেন্স / মাধ্যম</span></label>
-                <input id="depositReference" type="text" placeholder="যেমন: বিকাশ / ব্যাংক #REF-101" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                <input id="depositReference" type="text" data-i18n-ph="ph_dep_ref" placeholder="যেমন: বিকাশ / ব্যাংক #REF-101" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
               <div>
                 <label for="depositNote" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_note">বিবরণ / নোট</span></label>
-                <textarea id="depositNote" rows="2" placeholder="যেমন: মাসিক ফান্ড / বেতন / সঞ্চয়" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
+                <textarea id="depositNote" rows="2" data-i18n-ph="ph_dep_note" placeholder="যেমন: মাসিক ফান্ড / বেতন / সঞ্চয়" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
               </div>
               <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2">
                 <i data-lucide="save" class="w-4 h-4"></i>
@@ -361,19 +481,22 @@
       <!-- PAGE 3: MY PROFILE -->
       <section id="page-profile" class="page-section hidden space-y-6">
         <div class="max-w-2xl mx-auto bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 space-y-5">
-          <h2 data-i18n="profile_card_title" class="text-base sm:text-lg font-bold text-slate-900">মাই প্রোফাইল</h2>
+          <div class="flex items-center justify-between gap-2">
+            <h2 data-i18n="profile_card_title" class="text-base sm:text-lg font-bold text-slate-900">মাই প্রোফাইল</h2>
+            <span id="profileUsernameBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">@member</span>
+          </div>
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
             <img id="profileAvatarPreview" src="https://placehold.co/120x120/059669/ffffff?text=US" alt="User Profile" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-emerald-500/30 shrink-0" />
             <div class="space-y-2">
-              <p class="text-xs font-semibold text-slate-700">প্রোফাইল ছবি পরিবর্তন করুন</p>
+              <p data-i18n="profile_photo_change" class="text-xs font-semibold text-slate-700">প্রোফাইল ছবি পরিবর্তন করুন (সর্বোচ্চ ৫০০ KB)</p>
               <div class="flex flex-wrap items-center gap-2">
                 <label class="cursor-pointer px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-slate-700 border border-slate-300 text-xs font-semibold inline-flex items-center gap-1.5">
                   <i data-lucide="camera" class="w-3.5 h-3.5"></i>
-                  <span>ছবি আপলোড</span>
+                  <span data-i18n="upload_photo">ছবি আপলোড</span>
                   <input id="profilePhotoInput" type="file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
                 </label>
-                <button type="button" onclick="resetProfilePhoto()" class="px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50">
+                <button type="button" onclick="resetProfilePhoto()" data-i18n="default_photo" class="px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50">
                   ডিফল্ট ছবি
                 </button>
               </div>
@@ -381,33 +504,83 @@
           </div>
 
           <form id="profileForm" onsubmit="handleProfileSave(event)" class="space-y-4">
-            <div>
-              <label for="profileName" class="block text-xs font-semibold text-slate-700 mb-1">পূর্ণ নাম</label>
-              <input id="profileName" type="text" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label for="profileEmail" class="block text-xs font-semibold text-slate-700 mb-1">ইমেইল ঠিকানা</label>
+                <label for="profileName" data-i18n="reg_fullname" class="block text-xs font-semibold text-slate-700 mb-1">পূর্ণ নাম</label>
+                <input id="profileName" type="text" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+              </div>
+              <div>
+                <label for="profileUsername" data-i18n="reg_username" class="block text-xs font-semibold text-slate-700 mb-1">ইউজারনেম / ডাকনাম</label>
+                <input id="profileUsername" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="profileEmail" data-i18n="reg_email" class="block text-xs font-semibold text-slate-700 mb-1">ইমেইল ঠিকানা</label>
                 <input id="profileEmail" type="email" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm" />
               </div>
               <div>
-                <label for="profilePhone" class="block text-xs font-semibold text-slate-700 mb-1">মোবাইল নম্বর</label>
+                <label for="profilePhone" data-i18n="reg_mobile" class="block text-xs font-semibold text-slate-700 mb-1">মোবাইল নম্বর</label>
                 <input id="profilePhone" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label for="ledgerBookTitle" class="block text-xs font-semibold text-slate-700 mb-1">হিসাবের খাতা / গ্রুপের নাম</label>
+                <label for="profileDob" data-i18n="reg_dob" class="block text-xs font-semibold text-slate-700 mb-1">জন্মতারিখ</label>
+                <input id="profileDob" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+              </div>
+              <div>
+                <label for="profileGender" data-i18n="reg_gender" class="block text-xs font-semibold text-slate-700 mb-1">লিঙ্গ</label>
+                <select id="profileGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                  <option value="" data-i18n="select_gender">নির্বাচন করুন</option>
+                  <option value="Male" data-i18n="gender_male">পুরুষ</option>
+                  <option value="Female" data-i18n="gender_female">মহিলা</option>
+                  <option value="Other" data-i18n="gender_other">অন্যান্য</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="profileCountry" data-i18n="reg_country" class="block text-xs font-semibold text-slate-700 mb-1">দেশ / অঞ্চল</label>
+                <select id="profileCountry" onchange="handleLocationDropdownChange('profileCountry', 'profileArea')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                  <option value="Bangladesh" data-i18n="country_bd">বাংলাদেশ (Bangladesh)</option>
+                  <option value="India" data-i18n="country_in">ভারত (India)</option>
+                  <option value="Saudi Arabia" data-i18n="country_sa">সৌদি আরব (Saudi Arabia)</option>
+                  <option value="United Arab Emirates" data-i18n="country_ae">সংযুক্ত আরব আমিরাত (UAE)</option>
+                  <option value="Malaysia" data-i18n="country_my">মালয়েশিয়া (Malaysia)</option>
+                  <option value="United Kingdom" data-i18n="country_uk">যুক্তরাজ্য (UK)</option>
+                  <option value="United States" data-i18n="country_us">যুক্তরাষ্ট্র (USA)</option>
+                  <option value="Other" data-i18n="country_other">অন্যান্য</option>
+                </select>
+              </div>
+              <div>
+                <label for="profileArea" data-i18n="reg_area" class="block text-xs font-semibold text-slate-700 mb-1">বিভাগ / জেলা / শহর</label>
+                <select id="profileArea" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white"></select>
+              </div>
+            </div>
+
+            <div>
+              <label for="profileAddress" data-i18n="reg_address" class="block text-xs font-semibold text-slate-700 mb-1">বিস্তারিত ঠিকানা</label>
+              <textarea id="profileAddress" rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="ledgerBookTitle" data-i18n="profile_book_title" class="block text-xs font-semibold text-slate-700 mb-1">হিসাবের খাতা / গ্রুপের নাম</label>
                 <input id="ledgerBookTitle" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
               <div>
-                <label for="userLocation" class="block text-xs font-semibold text-slate-700 mb-1">অবস্থান / শহর</label>
+                <label for="userLocation" data-i18n="profile_city_label" class="block text-xs font-semibold text-slate-700 mb-1">অবস্থান / শহর</label>
                 <input id="userLocation" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
             </div>
+
             <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-              <span>প্রোফাইল সেভ করুন</span>
+              <span data-i18n="profile_update_btn">আপডেট</span>
             </button>
           </form>
         </div>
@@ -427,20 +600,20 @@
               </div>
               <div>
                 <label for="expWhere" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_where">কোথায় খরচ করেছি</span> *</label>
-                <input id="expWhere" type="text" required placeholder="যেমন: বাজার / ফার্মেসি / দোকান" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                <input id="expWhere" type="text" required data-i18n-ph="ph_exp_where" placeholder="যেমন: বাজার / ফার্মেসি / দোকান" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
               <div>
                 <label for="expForWhom" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_for_whom">কার জন্য খরচ করেছি</span> *</label>
-                <input id="expForWhom" type="text" required placeholder="যেমন: পরিবার / সদস্য / নিজের প্রয়োজনে" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                <input id="expForWhom" type="text" required data-i18n-ph="ph_exp_whom" placeholder="যেমন: পরিবার / সদস্য / নিজের প্রয়োজনে" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
               <div>
                 <label for="expWhy" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_why">কেন খরচ করেছি</span> *</label>
-                <input id="expWhy" type="text" required placeholder="যেমন: বাজার সদাই / চিকিৎসা / বিল" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                <input id="expWhy" type="text" required data-i18n-ph="ph_exp_why" placeholder="যেমন: বাজার সদাই / চিকিৎসা / বিল" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label for="expReference" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_reference_short">রেফারেন্স</span></label>
-                  <input id="expReference" type="text" placeholder="যেমন: ভাউচার #১২" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                  <input id="expReference" type="text" data-i18n-ph="ph_exp_ref" placeholder="যেমন: ভাউচার #১২" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
                 </div>
                 <div>
                   <label for="expAmount" class="block text-xs font-semibold text-slate-700 mb-1"><span data-i18n="field_amount">টাকার পরিমাণ</span> *</label>
@@ -466,23 +639,23 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                 <div>
-                  <label for="filterStartDate" class="block text-[11px] font-semibold text-slate-600 mb-1">শুরুর তারিখ</label>
+                  <label for="filterStartDate" data-i18n="filter_start" class="block text-[11px] font-semibold text-slate-600 mb-1">শুরুর তারিখ</label>
                   <input id="filterStartDate" type="date" onchange="renderAllViews()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm" />
                 </div>
                 <div>
-                  <label for="filterEndDate" class="block text-[11px] font-semibold text-slate-600 mb-1">শেষের তারিখ</label>
+                  <label for="filterEndDate" data-i18n="filter_end" class="block text-[11px] font-semibold text-slate-600 mb-1">শেষের তারিখ</label>
                   <input id="filterEndDate" type="date" onchange="renderAllViews()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm" />
                 </div>
                 <div>
-                  <label for="filterType" class="block text-[11px] font-semibold text-slate-600 mb-1">ধরন</label>
+                  <label for="filterType" data-i18n="filter_type" class="block text-[11px] font-semibold text-slate-600 mb-1">ধরন</label>
                   <select id="filterType" onchange="renderAllViews()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white">
-                    <option value="all">সব</option>
-                    <option value="expense">শুধুমাত্র খরচ</option>
-                    <option value="deposit">শুধুমাত্র ডিপোজিট</option>
+                    <option value="all" data-i18n="type_all">সব</option>
+                    <option value="expense" data-i18n="type_expense_only">শুধুমাত্র খরচ</option>
+                    <option value="deposit" data-i18n="type_deposit_only">শুধুমাত্র ডিপোজিট</option>
                   </select>
                 </div>
                 <div>
-                  <button type="button" onclick="clearDateFilters()" class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">রিসেট</button>
+                  <button type="button" onclick="clearDateFilters()" data-i18n="reset_btn" class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">রিসেট</button>
                 </div>
               </div>
             </div>
@@ -521,7 +694,7 @@
   <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
       <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
-        <h3 class="text-base font-bold text-slate-900">এন্ট্রি এডিট ও আপডেট করুন</h3>
+        <h3 data-i18n="edit_modal_title" class="text-base font-bold text-slate-900">এন্ট্রি এডিট ও আপডেট করুন</h3>
         <button type="button" onclick="closeEditModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form id="editEntryForm" onsubmit="handleUpdateEntrySubmit(event)" class="p-5 space-y-3.5">
@@ -529,41 +702,41 @@
         <input type="hidden" id="editEntryType" />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label for="editDate" class="block text-xs font-semibold text-slate-700 mb-1">তারিখ</label>
+            <label for="editDate" data-i18n="field_date" class="block text-xs font-semibold text-slate-700 mb-1">তারিখ</label>
             <input id="editDate" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
           </div>
           <div>
-            <label for="editAmount" class="block text-xs font-semibold text-slate-700 mb-1">টাকার পরিমাণ</label>
+            <label for="editAmount" data-i18n="field_amount" class="block text-xs font-semibold text-slate-700 mb-1">টাকার পরিমাণ</label>
             <input id="editAmount" type="number" step="0.01" min="1" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm tabular-nums" />
           </div>
         </div>
         <div id="editExpenseFields" class="space-y-3">
           <div>
-            <label for="editWhere" class="block text-xs font-semibold text-slate-700 mb-1">কোথায় খরচ করেছি</label>
+            <label for="editWhere" data-i18n="field_where" class="block text-xs font-semibold text-slate-700 mb-1">কোথায় খরচ করেছি</label>
             <input id="editWhere" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="editForWhom" class="block text-xs font-semibold text-slate-700 mb-1">কার জন্য খরচ করেছি</label>
+              <label for="editForWhom" data-i18n="field_for_whom" class="block text-xs font-semibold text-slate-700 mb-1">কার জন্য খরচ করেছি</label>
               <input id="editForWhom" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
             </div>
             <div>
-              <label for="editWhy" class="block text-xs font-semibold text-slate-700 mb-1">কেন খরচ করেছি</label>
+              <label for="editWhy" data-i18n="field_why" class="block text-xs font-semibold text-slate-700 mb-1">কেন খরচ করেছি</label>
               <input id="editWhy" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
             </div>
           </div>
         </div>
         <div id="editDepositFields" class="hidden">
-          <label for="editNote" class="block text-xs font-semibold text-slate-700 mb-1">বিবরণ / নোট</label>
+          <label for="editNote" data-i18n="field_note" class="block text-xs font-semibold text-slate-700 mb-1">বিবরণ / নোট</label>
           <input id="editNote" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
         </div>
         <div>
-          <label for="editReference" class="block text-xs font-semibold text-slate-700 mb-1">রেফারেন্স</label>
+          <label for="editReference" data-i18n="field_reference_short" class="block text-xs font-semibold text-slate-700 mb-1">রেফারেন্স</label>
           <input id="editReference" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
         </div>
         <div class="flex items-center justify-end gap-2.5 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">বাতিল</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold">আপডেট সেভ করুন</button>
+          <button type="button" onclick="closeEditModal()" data-i18n="cancel_btn" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">বাতিল</button>
+          <button type="submit" data-i18n="update_save_btn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold">আপডেট সেভ করুন</button>
         </div>
       </form>
     </div>
@@ -572,11 +745,11 @@
   <!-- DELETE MODAL -->
   <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-      <h3 class="text-base font-bold text-slate-900">এন্ট্রি ডিলিট করবেন?</h3>
-      <p class="text-xs sm:text-sm text-slate-500">ডিলিট করলে সাথে সাথে ফায়ারবেস ও ব্যালেন্স আপডেট হবে।</p>
+      <h3 data-i18n="delete_modal_title" class="text-base font-bold text-slate-900">এন্ট্রি ডিলিট করবেন?</h3>
+      <p data-i18n="delete_modal_desc" class="text-xs sm:text-sm text-slate-500">ডিলিট করলে সাথে সাথে ফায়ারবেস ও ব্যালেন্স আপডেট হবে।</p>
       <div class="flex items-center justify-end gap-2 pt-1">
-        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">বাতিল</button>
-        <button type="button" onclick="confirmDeleteEntry()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold">ডিলিট করুন</button>
+        <button type="button" onclick="closeDeleteModal()" data-i18n="cancel_btn" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">বাতিল</button>
+        <button type="button" onclick="confirmDeleteEntry()" data-i18n="delete_confirm_btn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold">ডিলিট করুন</button>
       </div>
     </div>
   </div>
@@ -585,35 +758,38 @@
   <div id="pdfPreviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 p-2 sm:p-5 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 my-auto overflow-hidden">
       <div class="no-print px-4 sm:px-6 py-3.5 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2">
-        <span class="text-sm font-bold">তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ</span>
+        <span data-i18n="pdf_preview_title" class="text-sm font-bold">তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ</span>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="triggerPrintPDF()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">প্রিন্ট / PDF সেভ করুন</button>
-          <button type="button" onclick="closePdfModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">বন্ধ করুন</button>
+          <button type="button" onclick="triggerPrintPDF()" data-i18n="pdf_print_btn" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">প্রিন্ট / PDF সেভ করুন</button>
+          <button type="button" onclick="closePdfModal()" data-i18n="close_btn" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">বন্ধ করুন</button>
         </div>
       </div>
       <div id="pdfReportPrintArea" class="p-6 sm:p-8 bg-white text-slate-900 space-y-6 max-h-[82vh] overflow-y-auto">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b-2 border-slate-800 pb-4">
           <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট</h2>
+            <h2 id="pdfMainHeading" class="text-xl sm:text-2xl font-bold text-slate-900">হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট</h2>
             <p id="pdfReportRangeText" class="text-xs sm:text-sm text-slate-600 mt-1">তারিখের পরিসীমা: সকল তারিখ</p>
-            <p id="pdfReportUserMeta" class="text-xs text-slate-500 mt-0.5"></p>
           </div>
           <div class="text-left sm:text-right text-xs text-slate-500">
             <p id="pdfGeneratedDateLabel" class="font-semibold text-slate-700"></p>
             <p>Currency: BDT (৳)</p>
           </div>
         </div>
+
+        <!-- MEMBER INFO CARD AT TOP OF PDF -->
+        <div id="pdfMemberDetailsCard" class="p-4 rounded-xl bg-slate-50/90 border border-slate-300/90"></div>
+
         <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
           <div>
-            <p class="text-[11px] font-semibold text-slate-500">মোট ডিপোজিট</p>
+            <p id="pdfDepLabel" class="text-[11px] font-semibold text-slate-500">মোট ডিপোজিট</p>
             <p id="pdfSumDepVal" class="text-base sm:text-lg font-bold text-emerald-700 tabular-nums mt-0.5">৳০.০০</p>
           </div>
           <div>
-            <p class="text-[11px] font-semibold text-slate-500">মোট খরচ</p>
+            <p id="pdfExpLabel" class="text-[11px] font-semibold text-slate-500">মোট খরচ</p>
             <p id="pdfSumExpVal" class="text-base sm:text-lg font-bold text-rose-600 tabular-nums mt-0.5">৳০.০০</p>
           </div>
           <div>
-            <p class="text-[11px] font-semibold text-slate-500">অবশিষ্ট ব্যালেন্স</p>
+            <p id="pdfBalLabel" class="text-[11px] font-semibold text-slate-500">অবশিষ্ট ব্যালেন্স</p>
             <p id="pdfSumBalVal" class="text-base sm:text-lg font-bold text-slate-900 tabular-nums mt-0.5">৳০.০০</p>
           </div>
         </div>
@@ -621,13 +797,13 @@
           <table class="w-full text-left border-collapse border border-slate-300 text-xs">
             <thead>
               <tr class="bg-slate-100 text-slate-800">
-                <th class="border border-slate-300 p-2">তারিখ</th>
-                <th class="border border-slate-300 p-2">ধরন</th>
-                <th class="border border-slate-300 p-2">কোথায় খরচ</th>
-                <th class="border border-slate-300 p-2">কার জন্য</th>
-                <th class="border border-slate-300 p-2">কেন খরচ / বিবরণ</th>
-                <th class="border border-slate-300 p-2">রেফারেন্স</th>
-                <th class="border border-slate-300 p-2 text-right">পরিমাণ</th>
+                <th id="pdfThDate" class="border border-slate-300 p-2">তারিখ</th>
+                <th id="pdfThType" class="border border-slate-300 p-2">ধরন</th>
+                <th id="pdfThWhere" class="border border-slate-300 p-2">কোথায় খরচ</th>
+                <th id="pdfThWhom" class="border border-slate-300 p-2">কার জন্য</th>
+                <th id="pdfThWhy" class="border border-slate-300 p-2">কেন খরচ / বিবরণ</th>
+                <th id="pdfThRef" class="border border-slate-300 p-2">রেফারেন্স</th>
+                <th id="pdfThAmt" class="border border-slate-300 p-2 text-right">পরিমাণ</th>
               </tr>
             </thead>
             <tbody id="pdfReportTableBody"></tbody>
@@ -684,17 +860,24 @@
       getUid() {
         return fbAuth.currentUser?.uid || null;
       },
-      async registerMember(name, email, password) {
-        const cred = await createUserWithEmailAndPassword(fbAuth, email, password);
+      async registerMember(regData, password) {
+        const cred = await createUserWithEmailAndPassword(fbAuth, regData.email, password);
         const uid = cred.user.uid;
         const profileData = {
           uid,
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          phone: "",
+          name: regData.name.trim(),
+          username: regData.username.trim(),
+          email: regData.email.trim().toLowerCase(),
+          phone: regData.phone.trim(),
+          dob: regData.dob || "",
+          gender: regData.gender || "",
+          country: regData.country || "Bangladesh",
+          area: regData.area || "",
+          address: regData.address.trim(),
+          termsAccepted: true,
           bookTitle: "হিসাবের খাতা",
-          location: "",
-          avatar: "https://placehold.co/120x120/059669/ffffff?text=US",
+          location: regData.area || "",
+          avatar: regData.avatar || "https://placehold.co/120x120/059669/ffffff?text=US",
           createdAt: new Date().toISOString()
         };
         await setDoc(doc(fbDb, "users", uid), profileData, { merge: true });
@@ -716,7 +899,21 @@
 
         const profile = userDocSnap.exists()
           ? userDocSnap.data()
-          : { uid, name: email.split("@")[0], email, avatar: "https://placehold.co/120x120/059669/ffffff?text=US" };
+          : {
+              uid,
+              name: email.split("@")[0],
+              username: email.split("@")[0],
+              email,
+              phone: "",
+              dob: "",
+              gender: "",
+              country: "Bangladesh",
+              area: "",
+              address: "",
+              bookTitle: "হিসাবের খাতা",
+              location: "",
+              avatar: "https://placehold.co/120x120/059669/ffffff?text=US"
+            };
 
         return { profile, transactions };
       },
@@ -750,17 +947,390 @@
   <script>
     const SESSION_KEY = 'ledger_auth_session_v2';
     const DEFAULT_AVATAR = 'https://placehold.co/120x120/059669/ffffff?text=US';
+    const MAX_PHOTO_BYTES = 500 * 1024;
     const todayStr = () => new Date().toISOString().split('T')[0];
+
+    const LOCATION_OPTIONS = {
+      Bangladesh: [
+        { val: 'Sylhet / Sunamganj', bn: 'সিলেট / সুনামগঞ্জ', en: 'Sylhet / Sunamganj' },
+        { val: 'Dhaka / Gazipur', bn: 'ঢাকা / গাজীপুর', en: 'Dhaka / Gazipur' },
+        { val: 'Chattogram', bn: 'চট্টগ্রাম', en: 'Chattogram' },
+        { val: 'Rajshahi', bn: 'রাজশাহী', en: 'Rajshahi' },
+        { val: 'Khulna', bn: 'খুলনা', en: 'Khulna' },
+        { val: 'Barishal', bn: 'বরিশাল', en: 'Barishal' },
+        { val: 'Rangpur', bn: 'রংপুর', en: 'Rangpur' },
+        { val: 'Mymensingh', bn: 'ময়মনসিংহ', en: 'Mymensingh' }
+      ],
+      India: [
+        { val: 'Kolkata / West Bengal', bn: 'কলকাতা / পশ্চিমবঙ্গ', en: 'Kolkata / West Bengal' },
+        { val: 'Assam / Silchar', bn: 'আসাম / শিলচর', en: 'Assam / Silchar' },
+        { val: 'Tripura / Agartala', bn: 'ত্রিপুরা / আগরতলা', en: 'Tripura / Agartala' },
+        { val: 'New Delhi', bn: 'নয়াদিল্লি', en: 'New Delhi' }
+      ],
+      'Saudi Arabia': [
+        { val: 'Riyadh', bn: 'রিয়াদ', en: 'Riyadh' },
+        { val: 'Jeddah / Makkah', bn: 'জেদ্দা / মক্কা', en: 'Jeddah / Makkah' },
+        { val: 'Dammam', bn: 'দাম্মাম', en: 'Dammam' }
+      ],
+      'United Arab Emirates': [
+        { val: 'Dubai', bn: 'দুবাই', en: 'Dubai' },
+        { val: 'Abu Dhabi', bn: 'আবুধাবি', en: 'Abu Dhabi' },
+        { val: 'Sharjah', bn: 'শারজাহ', en: 'Sharjah' }
+      ],
+      Malaysia: [
+        { val: 'Kuala Lumpur', bn: 'কুয়ালালামপুর', en: 'Kuala Lumpur' },
+        { val: 'Penang', bn: 'পেনাং', en: 'Penang' },
+        { val: 'Johor Bahru', bn: 'জোহর বারু', en: 'Johor Bahru' }
+      ],
+      'United Kingdom': [
+        { val: 'London', bn: 'লন্ডন', en: 'London' },
+        { val: 'Birmingham', bn: 'বার্মিংহাম', en: 'Birmingham' },
+        { val: 'Manchester', bn: 'ম্যানচেস্টার', en: 'Manchester' }
+      ],
+      'United States': [
+        { val: 'New York', bn: 'নিউ ইয়র্ক', en: 'New York' },
+        { val: 'Los Angeles', bn: 'লস অ্যাঞ্জেলেস', en: 'Los Angeles' },
+        { val: 'Houston / Texas', bn: 'হিউস্টন / টেক্সাস', en: 'Houston / Texas' }
+      ],
+      Other: [
+        { val: 'Other City / Region', bn: 'অন্যান্য শহর / অঞ্চল', en: 'Other City / Region' }
+      ]
+    };
+
+    const I18N = {
+      bn: {
+        brand_title: 'হিসাব নিকাশ',
+        brand_sub: 'আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা',
+        nav_home: 'হোম',
+        nav_account: 'একাউন্ট (ডিপোজিট)',
+        nav_profile: 'মাই প্রোফাইল',
+        nav_ledger: 'হিসাব নিকাশ ও রিপোর্ট',
+        logout_btn: 'লগ আউট',
+        tab_login: 'লগইন',
+        tab_register: 'রেজিস্ট্রেশন',
+        login_title: 'একাউন্টে লগইন করুন',
+        login_sub: 'নতুন রেজিস্ট্রেশন বা লগইন করলে সাথে সাথে ফায়ারবেসে তথ্য সংরক্ষিত হবে।',
+        reg_title: 'নতুন মেম্বার রেজিস্ট্রেশন',
+        reg_sub: 'সব তথ্য পূরণ করে রেজিস্ট্রেশন কনফার্ম করুন।',
+        login_btn: 'লগইন করুন',
+        reg_confirm_btn: 'রেজিস্ট্রেশন কনফার্ম',
+        reg_photo: 'প্রোফাইল ছবি (সর্বোচ্চ ৫০০ KB)',
+        choose_photo: 'ছবি নির্বাচন করুন',
+        photo_limit_hint: 'সর্বোচ্চ সাইজ: 500 KB',
+        reg_fullname: 'পুরো নাম',
+        ph_fullname: 'আপনার পুরো নাম লিখুন',
+        reg_username: 'ইউজারনেম / ডাকনাম',
+        ph_username: 'ইউজারনেম বা ডাকনাম লিখুন',
+        reg_email: 'ইমেইল ঠিকানা',
+        reg_mobile: 'মোবাইল নম্বর',
+        ph_mobile: '01XXXXXXXXX',
+        reg_password: 'পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)',
+        reg_confirm_password: 'পাসওয়ার্ড পুনরায় লিখুন',
+        reg_dob: 'জন্মতারিখ',
+        reg_gender: 'লিঙ্গ',
+        select_gender: 'নির্বাচন করুন',
+        gender_male: 'পুরুষ',
+        gender_female: 'মহিলা',
+        gender_other: 'অন্যান্য',
+        reg_country: 'দেশ / অঞ্চল',
+        country_bd: 'বাংলাদেশ (Bangladesh)',
+        country_in: 'ভারত (India)',
+        country_sa: 'সৌদি আরব (Saudi Arabia)',
+        country_ae: 'সংযুক্ত আরব আমিরাত (UAE)',
+        country_my: 'মালয়েশিয়া (Malaysia)',
+        country_uk: 'যুক্তরাজ্য (UK)',
+        country_us: 'যুক্তরাষ্ট্র (USA)',
+        country_other: 'অন্যান্য',
+        reg_area: 'বিভাগ / জেলা / শহর',
+        reg_address: 'বিস্তারিত ঠিকানা',
+        ph_address: 'গ্রাম/মহল্লা, রোড, বাড়ি বা পোস্ট অফিস লিখুন',
+        reg_terms: 'আমি শর্তাবলি ও গোপনীয়তা নীতি (Terms & Conditions / Privacy Policy) মেনে নিচ্ছি।',
+        auth_footer_note: 'লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না',
+        stat_balance: 'বর্তমান একাউন্ট ব্যালেন্স',
+        stat_balance_sub: 'ডিপোজিট যুক্ত হয় এবং খরচ স্বয়ংক্রিয়ভাবে বাদ যায়',
+        stat_deposits: 'মোট ডিপোজিট / আয়',
+        stat_expenses: 'মোট খরচ',
+        home_badge: 'হোম ড্যাশবোর্ড',
+        home_welcome_prefix: 'স্বাগতম',
+        home_welcome_desc: 'যেকোনো ডিপোজিট বা আয় যুক্ত করুন, খরচের বিস্তারিত তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।',
+        quick_deposit: 'ডিপোজিট যুক্ত করুন',
+        quick_expense: 'খরচ এন্ট্রি করুন',
+        recent_activity_title: 'সাম্প্রতিক লেনদেনসমূহ',
+        recent_activity_sub: 'সর্বশেষ ডিপোজিট ও খরচের তালিকা',
+        view_all_ledger: 'সব হিসাব দেখুন',
+        deposit_form_title: 'নতুন ডিপোজিট / আয় এন্ট্রি',
+        deposit_form_sub: 'সেভ করলে সাথে সাথে ফায়ারবেসে জমা হবে',
+        field_date: 'তারিখ',
+        field_amount: 'টাকার পরিমাণ',
+        field_reference: 'রেফারেন্স / মাধ্যম',
+        field_reference_short: 'রেফারেন্স',
+        ph_dep_ref: 'যেমন: বিকাশ / ব্যাংক #REF-101',
+        field_note: 'বিবরণ / নোট',
+        ph_dep_note: 'যেমন: মাসিক ফান্ড / বেতন / সঞ্চয়',
+        save_btn: 'সেভ করুন',
+        account_history_title: 'একাউন্ট ডিপোজিট ও লেনদেন বিবরণী',
+        col_type: 'ধরন',
+        col_actions: 'অ্যাকশন',
+        type_deposit: 'ডিপোজিট',
+        type_expense: 'খরচ',
+        profile_card_title: 'মাই প্রোফাইল',
+        profile_photo_change: 'প্রোফাইল ছবি পরিবর্তন করুন (সর্বোচ্চ ৫০০ KB)',
+        upload_photo: 'ছবি আপলোড',
+        default_photo: 'ডিফল্ট ছবি',
+        profile_book_title: 'হিসাবের খাতা / গ্রুপের নাম',
+        profile_city_label: 'অবস্থান / শহর',
+        profile_update_btn: 'আপডেট',
+        expense_form_title: 'খরচের হিসাব এন্ট্রি',
+        expense_form_sub: 'সেভ করলে সাথে সাথে ফায়ারবেসে জমা হবে ও ব্যালেন্স কমবে',
+        field_where: 'কোথায় খরচ করেছি',
+        ph_exp_where: 'যেমন: বাজার / ফার্মেসি / দোকান',
+        field_for_whom: 'কার জন্য খরচ করেছি',
+        ph_exp_whom: 'যেমন: পরিবার / সদস্য / নিজের প্রয়োজনে',
+        field_why: 'কেন খরচ করেছি',
+        ph_exp_why: 'যেমন: বাজার সদাই / চিকিৎসা / বিল',
+        ph_exp_ref: 'যেমন: ভাউচার #১২',
+        date_filter_pdf_title: 'তারিখ বাই তারিখ ফিল্টার ও PDF রিপোর্ট',
+        export_pdf_btn: 'তারিখ বাই তারিখ PDF',
+        filter_start: 'শুরুর তারিখ',
+        filter_end: 'শেষের তারিখ',
+        filter_type: 'ধরন',
+        type_all: 'সব',
+        type_expense_only: 'শুধুমাত্র খরচ',
+        type_deposit_only: 'শুধুমাত্র ডিপোজিট',
+        reset_btn: 'রিসেট',
+        full_ledger_title: 'বিস্তারিত হিসাবের খাতা',
+        edit_modal_title: 'এন্ট্রি এডিট ও আপডেট করুন',
+        cancel_btn: 'বাতিল',
+        update_save_btn: 'আপডেট সেভ করুন',
+        delete_modal_title: 'এন্ট্রি ডিলিট করবেন?',
+        delete_modal_desc: 'ডিলিট করলে সাথে সাথে ফায়ারবেস ও ব্যালেন্স আপডেট হবে।',
+        delete_confirm_btn: 'ডিলিট করুন',
+        pdf_preview_title: 'তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ',
+        pdf_print_btn: 'প্রিন্ট / PDF সেভ করুন',
+        close_btn: 'বন্ধ করুন',
+        pdf_main_heading: 'হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট',
+        pdf_range_prefix: 'তারিখের পরিসীমা: ',
+        pdf_range_all: 'সকল তারিখ',
+        pdf_gen_date: 'রিপোর্ট তৈরির তারিখ: ',
+        pdf_dep: 'মোট ডিপোজিট',
+        pdf_exp: 'মোট খরচ',
+        pdf_bal: 'অবশিষ্ট ব্যালেন্স',
+        pdf_member_heading: 'মেম্বারের তথ্য (Member Information)',
+        pdf_m_name: 'নাম',
+        pdf_m_username: 'ইউজারনেম / ডাকনাম',
+        pdf_m_email: 'ইমেইল',
+        pdf_m_phone: 'মোবাইল',
+        pdf_m_dob: 'জন্মতারিখ',
+        pdf_m_gender: 'লিঙ্গ',
+        pdf_m_country: 'দেশ / অঞ্চল',
+        pdf_m_area: 'বিভাগ / জেলা / শহর',
+        pdf_m_address: 'বিস্তারিত ঠিকানা',
+        pdf_m_book: 'হিসাবের খাতা',
+        no_tx_found: 'কোনো লেনদেন পাওয়া যায়নি।',
+        edit_btn: 'এডিট'
+      },
+      en: {
+        brand_title: 'Hisab Nikash',
+        brand_sub: 'Income, Deposit & Expense Ledger Management',
+        nav_home: 'Home',
+        nav_account: 'Account (Deposits)',
+        nav_profile: 'My Profile',
+        nav_ledger: 'Ledger & Reports',
+        logout_btn: 'Logout',
+        tab_login: 'Login',
+        tab_register: 'Registration',
+        login_title: 'Login to Your Account',
+        login_sub: 'Register or login to sync your ledger data directly to Firebase.',
+        reg_title: 'New Member Registration',
+        reg_sub: 'Fill in all required details and confirm registration.',
+        login_btn: 'Login',
+        reg_confirm_btn: 'Confirm Registration',
+        reg_photo: 'Profile Photo (Max 500KB)',
+        choose_photo: 'Choose Photo',
+        photo_limit_hint: 'Max size: 500 KB',
+        reg_fullname: 'Full Name',
+        ph_fullname: 'Enter your full name',
+        reg_username: 'Username / Nickname',
+        ph_username: 'Enter username or nickname',
+        reg_email: 'Email Address',
+        reg_mobile: 'Mobile Number',
+        ph_mobile: '01XXXXXXXXX',
+        reg_password: 'Password (Min 6 chars)',
+        reg_confirm_password: 'Confirm Password',
+        reg_dob: 'Date of Birth',
+        reg_gender: 'Gender',
+        select_gender: 'Select',
+        gender_male: 'Male',
+        gender_female: 'Female',
+        gender_other: 'Other',
+        reg_country: 'Country / Region',
+        country_bd: 'Bangladesh',
+        country_in: 'India',
+        country_sa: 'Saudi Arabia',
+        country_ae: 'United Arab Emirates (UAE)',
+        country_my: 'Malaysia',
+        country_uk: 'United Kingdom (UK)',
+        country_us: 'United States (USA)',
+        country_other: 'Other',
+        reg_area: 'Division / District / City',
+        reg_address: 'Detailed Address',
+        ph_address: 'Village/Area, road, house or post office',
+        reg_terms: 'I agree to the Terms & Conditions / Privacy Policy.',
+        auth_footer_note: 'Persistent login enabled • Stays signed in after refresh',
+        stat_balance: 'Current Account Balance',
+        stat_balance_sub: 'Deposits add up and expenses deduct automatically',
+        stat_deposits: 'Total Deposits / Income',
+        stat_expenses: 'Total Expenses',
+        home_badge: 'Home Dashboard',
+        home_welcome_prefix: 'Welcome',
+        home_welcome_desc: 'Add deposits or income, record detailed expenses with references, and generate date-range PDF statements.',
+        quick_deposit: 'Add Deposit',
+        quick_expense: 'Add Expense',
+        recent_activity_title: 'Recent Transactions',
+        recent_activity_sub: 'Latest deposits and expenses',
+        view_all_ledger: 'View Full Ledger',
+        deposit_form_title: 'New Deposit / Income Entry',
+        deposit_form_sub: 'Saved immediately to Firebase Firestore',
+        field_date: 'Date',
+        field_amount: 'Amount',
+        field_reference: 'Reference / Channel',
+        field_reference_short: 'Reference',
+        ph_dep_ref: 'e.g. bKash / Bank #REF-101',
+        field_note: 'Description / Note',
+        ph_dep_note: 'e.g. Monthly fund / salary / savings',
+        save_btn: 'Save',
+        account_history_title: 'Account Deposits & Transaction History',
+        col_type: 'Type',
+        col_actions: 'Actions',
+        type_deposit: 'Deposit',
+        type_expense: 'Expense',
+        profile_card_title: 'My Profile',
+        profile_photo_change: 'Change Profile Photo (Max 500KB)',
+        upload_photo: 'Upload Photo',
+        default_photo: 'Default Photo',
+        profile_book_title: 'Ledger Book / Group Name',
+        profile_city_label: 'Location / City',
+        profile_update_btn: 'Update',
+        expense_form_title: 'Expense Entry',
+        expense_form_sub: 'Saved immediately to Firebase & updates balance',
+        field_where: 'Where Spent',
+        ph_exp_where: 'e.g. Market / Pharmacy / Shop',
+        field_for_whom: 'For Whom',
+        ph_exp_whom: 'e.g. Family / Member / Self',
+        field_why: 'Why Spent',
+        ph_exp_why: 'e.g. Groceries / Medical / Bill',
+        ph_exp_ref: 'e.g. Voucher #12',
+        date_filter_pdf_title: 'Date Range Filter & PDF Report',
+        export_pdf_btn: 'Date Range PDF',
+        filter_start: 'Start Date',
+        filter_end: 'End Date',
+        filter_type: 'Type',
+        type_all: 'All',
+        type_expense_only: 'Expenses Only',
+        type_deposit_only: 'Deposits Only',
+        reset_btn: 'Reset',
+        full_ledger_title: 'Detailed Expense Ledger',
+        edit_modal_title: 'Edit & Update Entry',
+        cancel_btn: 'Cancel',
+        update_save_btn: 'Save Update',
+        delete_modal_title: 'Delete Entry?',
+        delete_modal_desc: 'Deleting will immediately update Firebase and your balance.',
+        delete_confirm_btn: 'Delete',
+        pdf_preview_title: 'Date Range PDF Report Preview',
+        pdf_print_btn: 'Print / Save PDF',
+        close_btn: 'Close',
+        pdf_main_heading: 'Hisab Nikash — Date Range Statement',
+        pdf_range_prefix: 'Date Range: ',
+        pdf_range_all: 'All Dates',
+        pdf_gen_date: 'Generated Date: ',
+        pdf_dep: 'Total Deposits',
+        pdf_exp: 'Total Expenses',
+        pdf_bal: 'Remaining Balance',
+        pdf_member_heading: 'Member Information',
+        pdf_m_name: 'Name',
+        pdf_m_username: 'Username / Nickname',
+        pdf_m_email: 'Email',
+        pdf_m_phone: 'Mobile',
+        pdf_m_dob: 'Date of Birth',
+        pdf_m_gender: 'Gender',
+        pdf_m_country: 'Country / Region',
+        pdf_m_area: 'Division / District / City',
+        pdf_m_address: 'Detailed Address',
+        pdf_m_book: 'Ledger Book',
+        no_tx_found: 'No transactions found.',
+        edit_btn: 'Edit'
+      }
+    };
 
     const appState = {
       lang: 'bn',
       authTab: 'login',
       uid: null,
       userEmail: '',
-      profile: { name: 'User', email: '', phone: '', bookTitle: 'হিসাবের খাতা', location: '', avatar: DEFAULT_AVATAR },
+      regPhotoData: DEFAULT_AVATAR,
+      profile: {
+        name: 'User',
+        username: '',
+        email: '',
+        phone: '',
+        dob: '',
+        gender: '',
+        country: 'Bangladesh',
+        area: 'Sylhet / Sunamganj',
+        address: '',
+        bookTitle: 'হিসাবের খাতা',
+        location: '',
+        avatar: DEFAULT_AVATAR
+      },
       transactions: [],
       pendingDeleteId: null
     };
+
+    function t(key) {
+      return I18N[appState.lang]?.[key] ?? I18N.bn[key] ?? key;
+    }
+
+    function populateAreaDropdown(countrySelectId, areaSelectId, selectedVal = '') {
+      const countryEl = document.getElementById(countrySelectId);
+      const areaEl = document.getElementById(areaSelectId);
+      if (!countryEl || !areaEl) return;
+      const country = countryEl.value || 'Bangladesh';
+      const list = LOCATION_OPTIONS[country] || LOCATION_OPTIONS.Other;
+      const current = selectedVal || areaEl.value;
+      areaEl.innerHTML = list.map((item) => {
+        const label = appState.lang === 'en' ? item.en : item.bn;
+        return `<option value="${escapeHtml(item.val)}">${escapeHtml(label)}</option>`;
+      }).join('');
+      if (current && list.some((x) => x.val === current)) {
+        areaEl.value = current;
+      } else if (list[0]) {
+        areaEl.value = list[0].val;
+      }
+    }
+
+    function handleLocationDropdownChange(countrySelectId, areaSelectId) {
+      populateAreaDropdown(countrySelectId, areaSelectId);
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+        const key = el.getAttribute('data-i18n-ph');
+        el.placeholder = t(key);
+      });
+
+      const isReg = appState.authTab === 'register';
+      document.getElementById('authHeaderTitle').textContent = isReg ? t('reg_title') : t('login_title');
+      document.getElementById('authHeaderSub').textContent = isReg ? t('reg_sub') : t('login_sub');
+      document.getElementById('authSubmitText').textContent = isReg ? t('reg_confirm_btn') : t('login_btn');
+
+      populateAreaDropdown('authCountry', 'authArea', document.getElementById('authArea')?.value || '');
+      populateAreaDropdown('profileCountry', 'profileArea', appState.profile.area || document.getElementById('profileArea')?.value || '');
+      syncProfileUI();
+    }
 
     function setLanguage(lang) {
       appState.lang = lang;
@@ -772,16 +1342,32 @@
       document.getElementById('langEnBtn').className = lang === 'en'
         ? 'px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-emerald-600 text-white'
         : 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900';
+      applyTranslations();
       renderAllViews();
     }
 
     function switchAuthTab(tab) {
       appState.authTab = tab;
       const isReg = tab === 'register';
-      document.getElementById('registerNameGroup').classList.toggle('hidden', !isReg);
+      document.getElementById('registerFieldsGroup').classList.toggle('hidden', !isReg);
+      document.getElementById('registerMobileGroup').classList.toggle('hidden', !isReg);
+      document.getElementById('registerMoreGroup').classList.toggle('hidden', !isReg);
+
       document.getElementById('authName').required = isReg;
-      document.getElementById('authHeaderTitle').textContent = isReg ? 'নতুন মেম্বার রেজিস্ট্রেশন' : 'একাউন্টে লগইন করুন';
-      document.getElementById('authSubmitText').textContent = isReg ? 'রেজিস্ট্রেশন করুন' : 'লগইন করুন';
+      document.getElementById('authUsername').required = isReg;
+      document.getElementById('authMobile').required = isReg;
+      document.getElementById('authConfirmPassword').required = isReg;
+      document.getElementById('authDob').required = isReg;
+      document.getElementById('authGender').required = isReg;
+      document.getElementById('authCountry').required = isReg;
+      document.getElementById('authArea').required = isReg;
+      document.getElementById('authAddress').required = isReg;
+      document.getElementById('authTerms').required = isReg;
+
+      if (isReg) {
+        populateAreaDropdown('authCountry', 'authArea');
+      }
+
       document.getElementById('authErrorMsg').classList.add('hidden');
 
       document.getElementById('tabLoginBtn').className = !isReg
@@ -790,6 +1376,34 @@
       document.getElementById('tabRegisterBtn').className = isReg
         ? 'py-2 rounded-lg text-xs font-bold bg-white text-emerald-800 transition'
         : 'py-2 rounded-lg text-xs font-bold text-white/90 hover:bg-white/10 transition';
+
+      applyTranslations();
+      lucide.createIcons();
+    }
+
+    function handleRegPhotoChange(e) {
+      const file = e.target.files?.[0];
+      const errBox = document.getElementById('authErrorMsg');
+      errBox.classList.add('hidden');
+      if (!file) return;
+
+      if (file.size > MAX_PHOTO_BYTES) {
+        e.target.value = '';
+        const msg = appState.lang === 'en'
+          ? 'Profile photo must be 500KB or smaller.'
+          : 'প্রোফাইল ছবির সাইজ ৫০০ KB বা তার কম হতে হবে।';
+        errBox.textContent = msg;
+        errBox.classList.remove('hidden');
+        showToast(msg, 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        appState.regPhotoData = evt.target.result;
+        document.getElementById('regPhotoPreview').src = appState.regPhotoData;
+      };
+      reader.readAsDataURL(file);
     }
 
     async function handleAuthSubmit(e) {
@@ -797,29 +1411,63 @@
       const errBox = document.getElementById('authErrorMsg');
       errBox.classList.add('hidden');
 
-      const name = document.getElementById('authName').value.trim();
       const email = document.getElementById('authEmail').value.trim().toLowerCase();
       const password = document.getElementById('authPassword').value;
 
       try {
         if (appState.authTab === 'register') {
-          if (!name) throw new Error('পূর্ণ নাম লিখুন।');
-          const res = await window.firebaseBridge.registerMember(name, email, password);
+          const name = document.getElementById('authName').value.trim();
+          const username = document.getElementById('authUsername').value.trim();
+          const phone = document.getElementById('authMobile').value.trim();
+          const confirmPassword = document.getElementById('authConfirmPassword').value;
+          const dob = document.getElementById('authDob').value;
+          const gender = document.getElementById('authGender').value;
+          const country = document.getElementById('authCountry').value;
+          const area = document.getElementById('authArea').value;
+          const address = document.getElementById('authAddress').value.trim();
+          const termsAccepted = document.getElementById('authTerms').checked;
+
+          if (!name) throw new Error(appState.lang === 'en' ? 'Please enter full name.' : 'পুরো নাম লিখুন।');
+          if (!username) throw new Error(appState.lang === 'en' ? 'Please enter username/nickname.' : 'ইউজারনেম / ডাকনাম লিখুন।');
+          if (!phone) throw new Error(appState.lang === 'en' ? 'Please enter mobile number.' : 'মোবাইল নম্বর লিখুন।');
+          if (password !== confirmPassword) {
+            throw new Error(appState.lang === 'en' ? 'Password and Confirm Password do not match.' : 'পাসওয়ার্ড এবং পুনরায় পাসওয়ার্ড মেলেনি।');
+          }
+          if (!dob) throw new Error(appState.lang === 'en' ? 'Please select date of birth.' : 'জন্মতারিখ নির্বাচন করুন।');
+          if (!gender) throw new Error(appState.lang === 'en' ? 'Please select gender.' : 'লিঙ্গ নির্বাচন করুন।');
+          if (!address) throw new Error(appState.lang === 'en' ? 'Please enter detailed address.' : 'বিস্তারিত ঠিকানা লিখুন।');
+          if (!termsAccepted) {
+            throw new Error(appState.lang === 'en' ? 'Please accept Terms & Conditions / Privacy Policy.' : 'শর্তাবলি ও গোপনীয়তা নীতিতে টিক দিন।');
+          }
+
+          const res = await window.firebaseBridge.registerMember({
+            name,
+            username,
+            email,
+            phone,
+            dob,
+            gender,
+            country,
+            area,
+            address,
+            avatar: appState.regPhotoData || DEFAULT_AVATAR
+          }, password);
+
           appState.uid = res.user.uid;
           appState.userEmail = email;
           appState.profile = res.profile;
           appState.transactions = [];
           localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: res.user.uid, email }));
-          enterApp('রেজিস্ট্রেশন সফল! ডাটা ফায়ারবেসে জমা হয়েছে।');
+          enterApp(appState.lang === 'en' ? 'Registration confirmed & saved to Firebase!' : 'রেজিস্ট্রেশন কনফার্ম হয়েছে! প্রোফাইল ও তথ্য ফায়ারবেসে জমা হয়েছে।');
         } else {
           const user = await window.firebaseBridge.loginMember(email, password);
           appState.uid = user.uid;
           appState.userEmail = email;
           localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: user.uid, email }));
-          await loadCloudAndOpen(user.uid, email, 'লগইন সফল হয়েছে!');
+          await loadCloudAndOpen(user.uid, email, appState.lang === 'en' ? 'Logged in successfully!' : 'লগইন সফল হয়েছে!');
         }
       } catch (err) {
-        errBox.textContent = err.message || 'লগইন বা রেজিস্ট্রেশনে সমস্যা হয়েছে।';
+        errBox.textContent = err.message || (appState.lang === 'en' ? 'Authentication error occurred.' : 'লগইন বা রেজিস্ট্রেশনে সমস্যা হয়েছে।');
         errBox.classList.remove('hidden');
       }
     }
@@ -850,14 +1498,14 @@
       document.getElementById('appShell').classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
       document.getElementById('menuToggleBtn').classList.add('hidden');
-      showToast('আপনি লগ আউট করেছেন।', 'info');
+      showToast(appState.lang === 'en' ? 'You have logged out.' : 'আপনি লগ আউট করেছেন।', 'info');
     }
 
-    function togglePasswordVisibility() {
-      const inp = document.getElementById('authPassword');
+    function togglePasswordVisibility(inputId, iconId) {
+      const inp = document.getElementById(inputId);
       const isPwd = inp.type === 'password';
       inp.type = isPwd ? 'text' : 'password';
-      document.getElementById('eyeIcon').setAttribute('data-lucide', isPwd ? 'eye-off' : 'eye');
+      document.getElementById(iconId).setAttribute('data-lucide', isPwd ? 'eye-off' : 'eye');
       lucide.createIcons();
     }
 
@@ -887,7 +1535,8 @@
 
     function formatMoney(num) {
       const val = Number(num) || 0;
-      return (val < 0 ? '-' : '') + '৳' + Math.abs(val).toLocaleString('bn-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const locale = appState.lang === 'en' ? 'en-US' : 'bn-BD';
+      return (val < 0 ? '-' : '') + '৳' + Math.abs(val).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function computeTotals(list = appState.transactions) {
@@ -920,9 +1569,9 @@
         document.getElementById('depositForm').reset();
         document.getElementById('depositDate').value = todayStr();
         renderAllViews();
-        showToast('ডিপোজিট সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
+        showToast(appState.lang === 'en' ? 'Deposit saved to Firebase!' : 'ডিপোজিট সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
       } catch (err) {
-        showToast(err.message || 'সেভ করা যায়নি', 'error');
+        showToast(err.message || (appState.lang === 'en' ? 'Could not save' : 'সেভ করা যায়নি'), 'error');
       }
     }
 
@@ -947,9 +1596,9 @@
         document.getElementById('expenseForm').reset();
         document.getElementById('expDate').value = todayStr();
         renderAllViews();
-        showToast('খরচ সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
+        showToast(appState.lang === 'en' ? 'Expense saved to Firebase!' : 'খরচ সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
       } catch (err) {
-        showToast(err.message || 'সেভ করা যায়নি', 'error');
+        showToast(err.message || (appState.lang === 'en' ? 'Could not save' : 'সেভ করা যায়নি'), 'error');
       }
     }
 
@@ -1017,9 +1666,9 @@
         appState.transactions[idx] = updated;
         closeEditModal();
         renderAllViews();
-        showToast('ফায়ারবেসে আপডেট সংরক্ষিত হয়েছে।', 'success');
+        showToast(appState.lang === 'en' ? 'Updated in Firebase.' : 'ফায়ারবেসে আপডেট সংরক্ষিত হয়েছে।', 'success');
       } catch (err) {
-        showToast(err.message || 'আপডেট করা যায়নি', 'error');
+        showToast(err.message || (appState.lang === 'en' ? 'Update failed' : 'আপডেট করা যায়নি'), 'error');
       }
     }
 
@@ -1045,9 +1694,9 @@
         appState.transactions = appState.transactions.filter((t) => t.id !== id);
         closeDeleteModal();
         renderAllViews();
-        showToast('এন্ট্রি ডিলিট করা হয়েছে।', 'info');
+        showToast(appState.lang === 'en' ? 'Entry deleted.' : 'এন্ট্রি ডিলিট করা হয়েছে।', 'info');
       } catch (err) {
-        showToast(err.message || 'ডিলিট করা যায়নি', 'error');
+        showToast(err.message || (appState.lang === 'en' ? 'Delete failed' : 'ডিলিট করা যায়নি'), 'error');
       }
     }
 
@@ -1078,8 +1727,12 @@
       document.getElementById('drawerBalanceValue').textContent = formatMoney(totals.balance);
       document.getElementById('statTotalDeposits').textContent = formatMoney(totals.totalDeposits);
       document.getElementById('statTotalExpenses').textContent = formatMoney(totals.totalExpenses);
-      document.getElementById('statDepositCount').textContent = `${totals.depositCount} টি ডিপোজিট এন্ট্রি`;
-      document.getElementById('statExpenseCount').textContent = `${totals.expenseCount} টি খরচ এন্ট্রি`;
+      document.getElementById('statDepositCount').textContent = appState.lang === 'en'
+        ? `${totals.depositCount} deposit entries`
+        : `${totals.depositCount} টি ডিপোজিট এন্ট্রি`;
+      document.getElementById('statExpenseCount').textContent = appState.lang === 'en'
+        ? `${totals.expenseCount} expense entries`
+        : `${totals.expenseCount} টি খরচ এন্ট্রি`;
 
       renderHomeRecent();
       renderAccountTable();
@@ -1091,25 +1744,25 @@
       const container = document.getElementById('homeRecentList');
       const recent = [...appState.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
       if (!recent.length) {
-        container.innerHTML = `<p class="py-6 text-center text-sm text-slate-400">কোনো লেনদেন পাওয়া যায়নি।</p>`;
+        container.innerHTML = `<p class="py-6 text-center text-sm text-slate-400">${escapeHtml(t('no_tx_found'))}</p>`;
         return;
       }
       container.innerHTML = recent.map((item) => {
         const isDep = item.type === 'deposit';
-        const titleText = isDep ? (item.note || item.why || 'ডিপোজিট') : `${item.why} (${item.forWhom} • ${item.where})`;
+        const titleText = isDep ? (item.note || item.why || t('type_deposit')) : `${item.why} (${item.forWhom} • ${item.where})`;
         return `
           <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div class="space-y-0.5 min-w-0">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="text-xs font-semibold text-slate-500 tabular-nums">${escapeHtml(item.date)}</span>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${isDep ? 'ডিপোজিট' : 'খরচ'}</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${escapeHtml(isDep ? t('type_deposit') : t('type_expense'))}</span>
                 <span class="text-[11px] text-slate-400 truncate">${escapeHtml(item.reference || '-')}</span>
               </div>
               <p class="text-sm font-medium text-slate-800 truncate">${escapeHtml(titleText)}</p>
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <span class="text-sm font-bold tabular-nums ${isDep ? 'text-emerald-700' : 'text-rose-600'}">${isDep ? '+' : '-'}${formatMoney(item.amount)}</span>
-              <button type="button" onclick="openEditModal('${item.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 text-xs font-semibold">এডিট</button>
+              <button type="button" onclick="openEditModal('${item.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 text-xs font-semibold">${escapeHtml(t('edit_btn'))}</button>
             </div>
           </div>
         `;
@@ -1120,7 +1773,7 @@
       const tbody = document.getElementById('accountTableBody');
       const list = [...appState.transactions].sort((a, b) => b.date.localeCompare(a.date));
       if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">কোনো লেনদেন পাওয়া যায়নি।</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">${escapeHtml(t('no_tx_found'))}</td></tr>`;
         return;
       }
       tbody.innerHTML = list.map((item) => {
@@ -1129,7 +1782,7 @@
         return `
           <tr class="hover:bg-slate-50/70">
             <td class="py-3 px-3 whitespace-nowrap tabular-nums text-slate-600">${escapeHtml(item.date)}</td>
-            <td class="py-3 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${isDep ? 'ডিপোজিট' : 'খরচ'}</span></td>
+            <td class="py-3 px-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${escapeHtml(isDep ? t('type_deposit') : t('type_expense'))}</span></td>
             <td class="py-3 px-3 text-slate-600">${escapeHtml(item.reference || '-')}</td>
             <td class="py-3 px-3 text-slate-800 max-w-[200px] truncate">${escapeHtml(desc)}</td>
             <td class="py-3 px-3 text-right font-bold tabular-nums whitespace-nowrap ${isDep ? 'text-emerald-700' : 'text-rose-600'}">${isDep ? '+' : '-'}${formatMoney(item.amount)}</td>
@@ -1145,9 +1798,11 @@
     function renderLedgerTable() {
       const tbody = document.getElementById('ledgerTableBody');
       const filtered = getFilteredTransactions();
-      document.getElementById('filteredCountBadge').textContent = `${filtered.length} টি এন্ট্রি`;
+      document.getElementById('filteredCountBadge').textContent = appState.lang === 'en'
+        ? `${filtered.length} entries`
+        : `${filtered.length} টি এন্ট্রি`;
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">কোনো লেনদেন পাওয়া যায়নি।</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">${escapeHtml(t('no_tx_found'))}</td></tr>`;
         return;
       }
       tbody.innerHTML = filtered.map((item) => {
@@ -1155,7 +1810,7 @@
         return `
           <tr class="hover:bg-slate-50/70">
             <td class="py-3 px-2.5 whitespace-nowrap tabular-nums text-slate-600">${escapeHtml(item.date)}</td>
-            <td class="py-3 px-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${isDep ? 'ডিপোজিট' : 'খরচ'}</span></td>
+            <td class="py-3 px-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${isDep ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${escapeHtml(isDep ? t('type_deposit') : t('type_expense'))}</span></td>
             <td class="py-3 px-2.5 text-slate-700">${escapeHtml(item.where || '-')}</td>
             <td class="py-3 px-2.5 text-slate-700">${escapeHtml(item.forWhom || '-')}</td>
             <td class="py-3 px-2.5 text-slate-800 font-medium">${escapeHtml(item.why || item.note || '-')}</td>
@@ -1170,23 +1825,72 @@
       }).join('');
     }
 
+    function formatGenderDisplay(g) {
+      if (!g) return '-';
+      if (g === 'Male') return t('gender_male');
+      if (g === 'Female') return t('gender_female');
+      if (g === 'Other') return t('gender_other');
+      return g;
+    }
+
+    function formatAreaDisplay(country, areaVal) {
+      if (!areaVal) return '-';
+      const list = LOCATION_OPTIONS[country] || LOCATION_OPTIONS.Other;
+      const found = list.find((x) => x.val === areaVal);
+      if (found) return appState.lang === 'en' ? found.en : found.bn;
+      return areaVal;
+    }
+
     function exportDateRangePDF() {
       const start = document.getElementById('filterStartDate')?.value || '';
       const end = document.getElementById('filterEndDate')?.value || '';
       const rows = [...getFilteredTransactions()].sort((a, b) => a.date.localeCompare(b.date));
       const sum = computeTotals(rows);
 
-      let rangeLabel = 'সকল তারিখ';
-      if (start && end) rangeLabel = `${start} থেকে ${end}`;
-      else if (start) rangeLabel = `${start} থেকে পরবর্তী`;
-      else if (end) rangeLabel = `${end} পর্যন্ত`;
+      let rangeLabel = t('pdf_range_all');
+      if (start && end) {
+        rangeLabel = appState.lang === 'en' ? `${start} to ${end}` : `${start} থেকে ${end}`;
+      } else if (start) {
+        rangeLabel = appState.lang === 'en' ? `From ${start}` : `${start} থেকে পরবর্তী`;
+      } else if (end) {
+        rangeLabel = appState.lang === 'en' ? `Up to ${end}` : `${end} পর্যন্ত`;
+      }
 
-      document.getElementById('pdfReportRangeText').textContent = 'তারিখের পরিসীমা: ' + rangeLabel;
-      document.getElementById('pdfReportUserMeta').textContent = `${appState.profile.name} (${appState.profile.email})`;
-      document.getElementById('pdfGeneratedDateLabel').textContent = 'রিপোর্ট তৈরির তারিখ: ' + todayStr();
+      document.getElementById('pdfMainHeading').textContent = t('pdf_main_heading');
+      document.getElementById('pdfReportRangeText').textContent = t('pdf_range_prefix') + rangeLabel;
+      document.getElementById('pdfGeneratedDateLabel').textContent = t('pdf_gen_date') + todayStr();
+
+      const p = appState.profile || {};
+      document.getElementById('pdfMemberDetailsCard').innerHTML = `
+        <p class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2.5">${escapeHtml(t('pdf_member_heading'))}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-xs">
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_name'))}:</span> <span class="font-bold text-slate-900">${escapeHtml(p.name || '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_username'))}:</span> <span class="text-slate-800">${escapeHtml(p.username ? '@' + p.username : '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_email'))}:</span> <span class="text-slate-800">${escapeHtml(p.email || '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_phone'))}:</span> <span class="text-slate-800 tabular-nums">${escapeHtml(p.phone || '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_dob'))}:</span> <span class="text-slate-800 tabular-nums">${escapeHtml(p.dob || '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_gender'))}:</span> <span class="text-slate-800">${escapeHtml(formatGenderDisplay(p.gender))}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_country'))}:</span> <span class="text-slate-800">${escapeHtml(p.country || '-')}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_area'))}:</span> <span class="text-slate-800">${escapeHtml(formatAreaDisplay(p.country, p.area))}</span></div>
+          <div><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_book'))}:</span> <span class="text-slate-800">${escapeHtml(p.bookTitle || '-')}</span></div>
+          <div class="sm:col-span-2 md:col-span-3"><span class="font-semibold text-slate-600">${escapeHtml(t('pdf_m_address'))}:</span> <span class="text-slate-800">${escapeHtml(p.address || p.location || '-')}</span></div>
+        </div>
+      `;
+
+      document.getElementById('pdfDepLabel').textContent = t('pdf_dep');
+      document.getElementById('pdfExpLabel').textContent = t('pdf_exp');
+      document.getElementById('pdfBalLabel').textContent = t('pdf_bal');
       document.getElementById('pdfSumDepVal').textContent = formatMoney(sum.totalDeposits);
       document.getElementById('pdfSumExpVal').textContent = formatMoney(sum.totalExpenses);
       document.getElementById('pdfSumBalVal').textContent = formatMoney(sum.balance);
+
+      document.getElementById('pdfThDate').textContent = t('field_date');
+      document.getElementById('pdfThType').textContent = t('col_type');
+      document.getElementById('pdfThWhere').textContent = t('field_where');
+      document.getElementById('pdfThWhom').textContent = t('field_for_whom');
+      document.getElementById('pdfThWhy').textContent = t('field_why');
+      document.getElementById('pdfThRef').textContent = t('field_reference_short');
+      document.getElementById('pdfThAmt').textContent = t('field_amount');
 
       document.getElementById('pdfReportTableBody').innerHTML = rows.length
         ? rows.map((item) => {
@@ -1194,7 +1898,7 @@
             return `
               <tr>
                 <td class="border border-slate-300 p-2 tabular-nums">${escapeHtml(item.date)}</td>
-                <td class="border border-slate-300 p-2 font-semibold ${isDep ? 'text-emerald-700' : 'text-rose-700'}">${isDep ? 'ডিপোজিট' : 'খরচ'}</td>
+                <td class="border border-slate-300 p-2 font-semibold ${isDep ? 'text-emerald-700' : 'text-rose-700'}">${escapeHtml(isDep ? t('type_deposit') : t('type_expense'))}</td>
                 <td class="border border-slate-300 p-2">${escapeHtml(item.where || '-')}</td>
                 <td class="border border-slate-300 p-2">${escapeHtml(item.forWhom || '-')}</td>
                 <td class="border border-slate-300 p-2">${escapeHtml(item.why || item.note || '-')}</td>
@@ -1203,7 +1907,7 @@
               </tr>
             `;
           }).join('')
-        : `<tr><td colspan="7" class="border border-slate-300 p-4 text-center text-slate-500">কোনো লেনদেন পাওয়া যায়নি।</td></tr>`;
+        : `<tr><td colspan="7" class="border border-slate-300 p-4 text-center text-slate-500">${escapeHtml(t('no_tx_found'))}</td></tr>`;
 
       const modal = document.getElementById('pdfPreviewModal');
       modal.classList.remove('hidden');
@@ -1221,26 +1925,39 @@
 
     function syncProfileUI() {
       document.getElementById('profileName').value = appState.profile.name || '';
+      document.getElementById('profileUsername').value = appState.profile.username || '';
       document.getElementById('profileEmail').value = appState.profile.email || '';
       document.getElementById('profilePhone').value = appState.profile.phone || '';
+      document.getElementById('profileDob').value = appState.profile.dob || '';
+      document.getElementById('profileGender').value = appState.profile.gender || '';
+      document.getElementById('profileCountry').value = appState.profile.country || 'Bangladesh';
+      populateAreaDropdown('profileCountry', 'profileArea', appState.profile.area || '');
+      document.getElementById('profileAddress').value = appState.profile.address || '';
       document.getElementById('ledgerBookTitle').value = appState.profile.bookTitle || '';
-      document.getElementById('userLocation').value = appState.profile.location || '';
+      document.getElementById('userLocation').value = appState.profile.location || appState.profile.area || '';
+
       document.getElementById('profileAvatarPreview').src = appState.profile.avatar || DEFAULT_AVATAR;
       document.getElementById('drawerAvatar').src = appState.profile.avatar || DEFAULT_AVATAR;
       document.getElementById('drawerUserName').textContent = appState.profile.name || 'User';
       document.getElementById('drawerUserEmail').textContent = appState.profile.email || '';
-      document.getElementById('homeWelcomeTitle').textContent = `স্বাগতম, ${appState.profile.name || 'User'}`;
+      document.getElementById('profileUsernameBadge').textContent = appState.profile.username ? `@${appState.profile.username}` : '@member';
+      document.getElementById('homeWelcomeTitle').textContent = `${t('home_welcome_prefix')}, ${appState.profile.name || 'User'}`;
     }
 
     async function handlePhotoUpload(e) {
       const file = e.target.files?.[0];
       if (!file || !appState.uid) return;
+      if (file.size > MAX_PHOTO_BYTES) {
+        e.target.value = '';
+        showToast(appState.lang === 'en' ? 'Profile photo must be 500KB or smaller.' : 'প্রোফাইল ছবির সাইজ ৫০০ KB বা তার কম হতে হবে।', 'error');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = async (evt) => {
         appState.profile.avatar = evt.target.result;
         syncProfileUI();
         await window.firebaseBridge.saveProfileNow(appState.uid, appState.profile);
-        showToast('প্রোফাইল ছবি ফায়ারবেসে সেভ হয়েছে।', 'success');
+        showToast(appState.lang === 'en' ? 'Profile photo saved to Firebase.' : 'প্রোফাইল ছবি ফায়ারবেসে সেভ হয়েছে।', 'success');
       };
       reader.readAsDataURL(file);
     }
@@ -1256,15 +1973,22 @@
       e.preventDefault();
       if (!appState.uid) return;
       appState.profile.name = document.getElementById('profileName').value.trim();
+      appState.profile.username = document.getElementById('profileUsername').value.trim();
       appState.profile.phone = document.getElementById('profilePhone').value.trim();
+      appState.profile.dob = document.getElementById('profileDob').value;
+      appState.profile.gender = document.getElementById('profileGender').value;
+      appState.profile.country = document.getElementById('profileCountry').value;
+      appState.profile.area = document.getElementById('profileArea').value;
+      appState.profile.address = document.getElementById('profileAddress').value.trim();
       appState.profile.bookTitle = document.getElementById('ledgerBookTitle').value.trim();
-      appState.profile.location = document.getElementById('userLocation').value.trim();
+      appState.profile.location = document.getElementById('userLocation').value.trim() || appState.profile.area;
+
       try {
         await window.firebaseBridge.saveProfileNow(appState.uid, appState.profile);
         syncProfileUI();
-        showToast('প্রোফাইল তথ্য ফায়ারবেসে সেভ হয়েছে।', 'success');
+        showToast(appState.lang === 'en' ? 'Profile updated in Firebase.' : 'প্রোফাইল তথ্য ফায়ারবেসে আপডেট হয়েছে।', 'success');
       } catch (err) {
-        showToast(err.message || 'সেভ করা যায়নি', 'error');
+        showToast(err.message || (appState.lang === 'en' ? 'Could not update' : 'আপডেট করা যায়নি'), 'error');
       }
     }
 
@@ -1293,6 +2017,9 @@
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('depositDate').value = todayStr();
       document.getElementById('expDate').value = todayStr();
+      populateAreaDropdown('authCountry', 'authArea');
+      populateAreaDropdown('profileCountry', 'profileArea');
+      applyTranslations();
       lucide.createIcons();
 
       try {
