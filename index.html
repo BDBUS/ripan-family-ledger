@@ -290,7 +290,7 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8">
 
     <!-- =================================================================== -->
-    <!-- LOGIN SCREEN (PUBLIC / FLEXIBLE ACCESS)                             -->
+    <!-- LOGIN SCREEN (PUBLIC / FIREBASE AUTH)                               -->
     <!-- =================================================================== -->
     <section id="loginView" class="min-h-[calc(100vh-11rem)] flex items-center justify-center py-4">
       <div class="w-full max-w-md bg-white rounded-3xl shadow-soft border border-slate-200/80 overflow-hidden">
@@ -302,7 +302,7 @@
             একাউন্টে লগইন করুন
           </h2>
           <p id="loginSubtitle" class="text-xs sm:text-sm text-emerald-100 mt-1.5 leading-relaxed">
-            আপনার ডিপোজিট, আয় ও খরচের হিসাব সহজে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।
+            আপনার ডিপোজিট, আয় ও খরচের হিসাব ফায়ারবেসে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।
           </p>
         </div>
 
@@ -1134,11 +1134,10 @@
   </footer>
 
   <!-- ===================================================================== -->
-  <!-- FIREBASE SDK MODULE (Lifetime Persistence + Auth + Firestore Sync)    -->
+  <!-- FIREBASE SDK MODULE (Direct Auth + Cloud Firestore CRUD)             -->
   <!-- ===================================================================== -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-analytics.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
       getAuth,
       setPersistence,
@@ -1147,7 +1146,7 @@
       createUserWithEmailAndPassword,
       onAuthStateChanged,
       signOut
-    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import {
       getFirestore,
       collection,
@@ -1156,7 +1155,7 @@
       getDoc,
       deleteDoc,
       getDocs
-    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCWYA7EynO4ScaToEZLqgxOdm1DZx09iEo",
@@ -1170,49 +1169,61 @@
 
     let fbAuth = null;
     let fbDb = null;
+    let currentFirebaseUid = null;
 
-    function getUserScopeKey(email) {
-      const clean = String(email || "public_guest").trim().toLowerCase().replace(/[^a-z0-9]/g, "_");
-      return `ledger_user_${clean}`;
+    function getUserDocScope(email) {
+      const uidPart = currentFirebaseUid || "guest_uid";
+      const emailPart = String(email || "guest@ledger.local").trim().toLowerCase().replace(/[^a-z0-9]/g, "_");
+      return `users/${uidPart}_${emailPart}`;
     }
 
     try {
       const app = initializeApp(firebaseConfig);
-      if (typeof window !== "undefined" && window.location.protocol !== "file:") {
-        try { getAnalytics(app); } catch (_) {}
-      }
       fbAuth = getAuth(app);
       fbDb = getFirestore(app);
       setPersistence(fbAuth, browserLocalPersistence).catch(() => {});
       window.__FIREBASE_READY__ = true;
     } catch (err) {
-      console.warn("Firebase init notice:", err);
+      console.error("Firebase init failed:", err);
       window.__FIREBASE_READY__ = false;
+      window.__FIREBASE_LAST_ERROR__ = err?.message || "Firebase init failed";
     }
 
     window.firebaseBridge = {
       isReady() {
         return Boolean(window.__FIREBASE_READY__ && fbAuth && fbDb);
       },
+      getLastError() {
+        return window.__FIREBASE_LAST_ERROR__ || "";
+      },
       async login(email, password) {
-        if (!this.isReady()) return { ok: false, fallback: true };
+        if (!this.isReady()) {
+          return { ok: false, error: new Error(window.__FIREBASE_LAST_ERROR__ || "Firebase not initialized") };
+        }
         try {
           await setPersistence(fbAuth, browserLocalPersistence);
           const cred = await signInWithEmailAndPassword(fbAuth, email, password);
+          currentFirebaseUid = cred.user?.uid || null;
+          window.__FIREBASE_LAST_ERROR__ = "";
           return { ok: true, user: cred.user };
         } catch (err) {
           if (err?.code === "auth/user-not-found" || err?.code === "auth/invalid-credential") {
             try {
               const created = await createUserWithEmailAndPassword(fbAuth, email, password);
+              currentFirebaseUid = created.user?.uid || null;
+              window.__FIREBASE_LAST_ERROR__ = "";
               return { ok: true, user: created.user, autoCreated: true };
             } catch (createErr) {
+              window.__FIREBASE_LAST_ERROR__ = createErr?.message || String(createErr);
               return { ok: false, error: createErr };
             }
           }
+          window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
           return { ok: false, error: err };
         }
       },
       async logout() {
+        currentFirebaseUid = null;
         if (!this.isReady()) return;
         try {
           await signOut(fbAuth);
@@ -1220,45 +1231,63 @@
       },
       async loadUserData(email) {
         if (!this.isReady()) return null;
-        const scope = getUserScopeKey(email);
+        const scope = getUserDocScope(email);
         try {
-          const snap = await getDocs(collection(fbDb, scope, "items", "transactions"));
+          const snap = await getDocs(collection(fbDb, `${scope}/transactions`));
           const items = [];
           snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
 
-          const profSnap = await getDoc(doc(fbDb, scope, "meta", "profile"));
+          const profSnap = await getDoc(doc(fbDb, `${scope}/meta/profile`));
           const profile = profSnap.exists() ? profSnap.data() : null;
+          window.__FIREBASE_LAST_ERROR__ = "";
           return { transactions: items, profile };
-        } catch (_) {
+        } catch (err) {
+          window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
           return null;
         }
       },
       async saveTransaction(email, entry) {
-        if (!this.isReady() || !entry?.id) return;
-        const scope = getUserScopeKey(email);
+        if (!this.isReady() || !entry?.id) return false;
+        const scope = getUserDocScope(email);
         try {
-          await setDoc(doc(fbDb, scope, "items", "transactions", entry.id), entry);
-        } catch (_) {}
+          await setDoc(doc(fbDb, `${scope}/transactions`, entry.id), entry);
+          window.__FIREBASE_LAST_ERROR__ = "";
+          return true;
+        } catch (err) {
+          window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
+          return false;
+        }
       },
       async removeTransaction(email, id) {
-        if (!this.isReady() || !id) return;
-        const scope = getUserScopeKey(email);
+        if (!this.isReady() || !id) return false;
+        const scope = getUserDocScope(email);
         try {
-          await deleteDoc(doc(fbDb, scope, "items", "transactions", id));
-        } catch (_) {}
+          await deleteDoc(doc(fbDb, `${scope}/transactions`, id));
+          window.__FIREBASE_LAST_ERROR__ = "";
+          return true;
+        } catch (err) {
+          window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
+          return false;
+        }
       },
       async saveProfile(email, profileObj) {
-        if (!this.isReady()) return;
-        const scope = getUserScopeKey(email);
+        if (!this.isReady()) return false;
+        const scope = getUserDocScope(email);
         try {
-          await setDoc(doc(fbDb, scope, "meta", "profile"), profileObj, { merge: true });
-        } catch (_) {}
+          await setDoc(doc(fbDb, `${scope}/meta/profile`), profileObj, { merge: true });
+          window.__FIREBASE_LAST_ERROR__ = "";
+          return true;
+        } catch (err) {
+          window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
+          return false;
+        }
       }
     };
 
     if (fbAuth) {
-      onAuthStateChanged(fbAuth, async (user) => {
+      onAuthStateChanged(fbAuth, (user) => {
         if (user && user.email) {
+          currentFirebaseUid = user.uid;
           window.dispatchEvent(new CustomEvent("firebase-auth-restored", { detail: { email: user.email } }));
         }
       });
@@ -1268,7 +1297,7 @@
   </script>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION JAVASCRIPT (LIFETIME SESSION + PUBLIC MULTI-USER SUPPORT)  -->
+  <!-- APPLICATION JAVASCRIPT (LIFETIME SESSION + FIREBASE SYNC)             -->
   <!-- ===================================================================== -->
   <script>
     const SESSION_STORAGE_KEY = 'ledger_lifetime_session_v1';
@@ -1288,7 +1317,7 @@
         nav_ledger: 'হিসাব নিকাশ ও রিপোর্ট',
         logout_btn: 'লগ আউট',
         login_title: 'একাউন্টে লগইন করুন',
-        login_subtitle: 'আপনার ডিপোজিট, আয় ও খরচের হিসাব সহজে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।',
+        login_subtitle: 'আপনার ডিপোজিট, আয় ও খরচের হিসাব ফায়ারবেসে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।',
         email_label: 'ইমেইল ঠিকানা',
         password_label: 'পাসওয়ার্ড',
         login_btn: 'লগইন করুন',
@@ -1367,7 +1396,7 @@
         pdf_sum_exp: 'মোট খরচ',
         pdf_sum_bal: 'অবশিষ্ট ব্যালেন্স',
         toast_login_ok: 'সফলভাবে লগইন করা হয়েছে!',
-        toast_login_err: 'সঠিক ইমেইল ও পাসওয়ার্ড দিন।',
+        toast_login_err: 'সঠিক ইমেইল ও পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর)।',
         toast_logout_ok: 'আপনি লগ আউট করেছেন।',
         toast_dep_saved: 'ডিপোজিট সেভ হয়েছে এবং ব্যালেন্স বৃদ্ধি পেয়েছে।',
         toast_exp_saved: 'খরচ এন্ট্রি সেভ হয়েছে এবং ব্যালেন্স থেকে টাকা মাইনাস হয়েছে।',
@@ -1387,7 +1416,7 @@
         nav_ledger: 'Ledger & PDF Report',
         logout_btn: 'Logout',
         login_title: 'Sign In to Account',
-        login_subtitle: 'Log in to manage your deposits, funds, and daily expenses with instant date-by-date PDF reports.',
+        login_subtitle: 'Log in to save your deposits, funds, and daily expenses to Firebase with instant PDF reports.',
         email_label: 'Email Address',
         password_label: 'Password',
         login_btn: 'Login',
@@ -1466,7 +1495,7 @@
         pdf_sum_exp: 'Total Expenses',
         pdf_sum_bal: 'Net Balance',
         toast_login_ok: 'Logged in successfully!',
-        toast_login_err: 'Please enter a valid email and password.',
+        toast_login_err: 'Please enter a valid email and password (min 6 chars).',
         toast_logout_ok: 'You have been logged out.',
         toast_dep_saved: 'Deposit saved and added to account balance.',
         toast_exp_saved: 'Expense saved and deducted from account balance.',
@@ -1589,6 +1618,30 @@
       }
     }
 
+    async function syncFromFirebaseIfReady(email) {
+      if (!window.firebaseBridge || !window.firebaseBridge.isReady()) return;
+      const cloudData = await window.firebaseBridge.loadUserData(email);
+      if (!cloudData) return;
+
+      if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
+        appState.transactions = cloudData.transactions;
+      } else if (Array.isArray(appState.transactions) && appState.transactions.length) {
+        for (const tx of appState.transactions) {
+          await window.firebaseBridge.saveTransaction(email, tx);
+        }
+      }
+
+      if (cloudData.profile) {
+        appState.profile = { ...appState.profile, ...cloudData.profile, email };
+      } else {
+        await window.firebaseBridge.saveProfile(email, appState.profile);
+      }
+
+      saveUserLocalRecord();
+      syncProfileToUI();
+      renderAllViews();
+    }
+
     function activateAuthenticatedUI(pageToOpen = 'home') {
       appState.isLoggedIn = true;
       document.getElementById('loginView').classList.add('hidden');
@@ -1683,7 +1736,7 @@
       const cleanEmail = email.trim().toLowerCase();
       const errBox = document.getElementById('loginErrorMsg');
 
-      if (!cleanEmail || !password) {
+      if (!cleanEmail || !password || password.length < 6) {
         errBox.textContent = tText('toast_login_err');
         errBox.classList.remove('hidden');
         return;
@@ -1704,16 +1757,9 @@
       if (window.firebaseBridge && window.firebaseBridge.isReady()) {
         const res = await window.firebaseBridge.login(cleanEmail, password);
         if (res.ok) {
-          const cloudData = await window.firebaseBridge.loadUserData(cleanEmail);
-          if (cloudData) {
-            if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
-              appState.transactions = cloudData.transactions;
-            }
-            if (cloudData.profile) {
-              appState.profile = { ...appState.profile, ...cloudData.profile, email: cleanEmail };
-            }
-            saveUserLocalRecord();
-          }
+          await syncFromFirebaseIfReady(cleanEmail);
+        } else if (res.error) {
+          showToast(res.error.message || 'Firebase Auth notice', 'error');
         }
       }
 
@@ -1849,7 +1895,12 @@
       document.getElementById('depositDate').value = todayStr();
 
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+      if (window.firebaseBridge) {
+        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+        if (!ok && window.firebaseBridge.getLastError()) {
+          showToast(window.firebaseBridge.getLastError(), 'error');
+        }
+      }
       showToast(tText('toast_dep_saved'), 'success');
     }
 
@@ -1882,7 +1933,12 @@
       document.getElementById('expDate').value = todayStr();
 
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+      if (window.firebaseBridge) {
+        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+        if (!ok && window.firebaseBridge.getLastError()) {
+          showToast(window.firebaseBridge.getLastError(), 'error');
+        }
+      }
       showToast(tText('toast_exp_saved'), 'success');
     }
 
@@ -1958,7 +2014,12 @@
       saveUserLocalRecord();
       closeEditModal();
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, updated);
+      if (window.firebaseBridge) {
+        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, updated);
+        if (!ok && window.firebaseBridge.getLastError()) {
+          showToast(window.firebaseBridge.getLastError(), 'error');
+        }
+      }
       showToast(tText('toast_updated'), 'success');
     }
 
@@ -1984,7 +2045,12 @@
       saveUserLocalRecord();
       closeDeleteModal();
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.removeTransaction(appState.userEmail, id);
+      if (window.firebaseBridge) {
+        const ok = await window.firebaseBridge.removeTransaction(appState.userEmail, id);
+        if (!ok && window.firebaseBridge.getLastError()) {
+          showToast(window.firebaseBridge.getLastError(), 'error');
+        }
+      }
       showToast(tText('toast_deleted'), 'info');
     }
 
@@ -2275,25 +2341,31 @@
       if (el) el.textContent = `${prefix} ${appState.profile.name || 'User'}`;
     }
 
-    function handlePhotoUpload(e) {
+    async function handlePhotoUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function (evt) {
+      reader.onload = async function (evt) {
         const dataUrl = evt.target.result;
         appState.profile.avatar = dataUrl;
         document.getElementById('profileAvatarPreview').src = dataUrl;
         document.getElementById('drawerAvatar').src = dataUrl;
         saveUserLocalRecord();
+        if (window.firebaseBridge) {
+          await window.firebaseBridge.saveProfile(appState.userEmail, appState.profile);
+        }
       };
       reader.readAsDataURL(file);
     }
 
-    function resetProfilePhoto() {
+    async function resetProfilePhoto() {
       appState.profile.avatar = DEFAULT_AVATAR;
       document.getElementById('profileAvatarPreview').src = DEFAULT_AVATAR;
       document.getElementById('drawerAvatar').src = DEFAULT_AVATAR;
       saveUserLocalRecord();
+      if (window.firebaseBridge) {
+        await window.firebaseBridge.saveProfile(appState.userEmail, appState.profile);
+      }
     }
 
     async function handleProfileSave(e) {
@@ -2308,7 +2380,7 @@
       appState.profile.location = document.getElementById('userLocation').value.trim();
 
       const newPass = document.getElementById('newAccountPassword').value;
-      if (newPass && newPass.trim().length >= 4) {
+      if (newPass && newPass.trim().length >= 6) {
         appState.passwordMap[nextEmail] = newPass.trim();
         document.getElementById('newAccountPassword').value = '';
       } else if (!appState.passwordMap[nextEmail] && appState.passwordMap[oldEmail]) {
@@ -2319,7 +2391,12 @@
       persistLifetimeSession(true, nextEmail);
       saveUserLocalRecord();
       syncProfileToUI();
-      if (window.firebaseBridge) await window.firebaseBridge.saveProfile(nextEmail, appState.profile);
+      if (window.firebaseBridge) {
+        const ok = await window.firebaseBridge.saveProfile(nextEmail, appState.profile);
+        if (!ok && window.firebaseBridge.getLastError()) {
+          showToast(window.firebaseBridge.getLastError(), 'error');
+        }
+      }
       showToast(tText('toast_profile_saved'), 'success');
     }
 
@@ -2351,25 +2428,19 @@
         .replace(/'/g, '&#39;');
     }
 
-    window.addEventListener('firebase-bridge-ready', refreshModeBadge);
+    window.addEventListener('firebase-bridge-ready', async () => {
+      refreshModeBadge();
+      if (appState.isLoggedIn && appState.userEmail) {
+        await syncFromFirebaseIfReady(appState.userEmail);
+      }
+    });
 
     window.addEventListener('firebase-auth-restored', async (evt) => {
       const restoredEmail = evt?.detail?.email;
       if (!restoredEmail) return;
       hydrateUserState(restoredEmail);
       persistLifetimeSession(true, restoredEmail);
-      if (window.firebaseBridge && window.firebaseBridge.isReady()) {
-        const cloudData = await window.firebaseBridge.loadUserData(restoredEmail);
-        if (cloudData) {
-          if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
-            appState.transactions = cloudData.transactions;
-          }
-          if (cloudData.profile) {
-            appState.profile = { ...appState.profile, ...cloudData.profile, email: restoredEmail };
-          }
-          saveUserLocalRecord();
-        }
-      }
+      await syncFromFirebaseIfReady(restoredEmail);
       activateAuthenticatedUI(appState.activePage || 'home');
     });
 
