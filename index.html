@@ -591,7 +591,7 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- PAGE 3: মাই প্রোফাইল / MY PROFILE (Clean Profile + Photo Only)    -->
+      <!-- PAGE 3: মাই প্রোফাইল / MY PROFILE                                 -->
       <!-- ================================================================= -->
       <section id="page-profile" class="page-section hidden space-y-6">
         <div class="max-w-2xl mx-auto bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 space-y-5">
@@ -1114,15 +1114,16 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- FIREBASE SDK MODULE (Auth + Firestore Sync for ripan-family-ledger)   -->
+  <!-- FIREBASE SDK MODULE (Auth + Firestore + Analytics)                    -->
   <!-- ===================================================================== -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-analytics.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
       signOut
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
     import {
       getFirestore,
       collection,
@@ -1130,36 +1131,31 @@
       setDoc,
       deleteDoc,
       getDocs
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
-    // আপনার Firebase প্রজেক্টের কনফিগ (apiKey ও measurementId আপনার দিলে এখানে বসাবেন)
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
+      apiKey: "AIzaSyCWYA7EynO4ScaToEZLqgxOdm1DZx09iEo",
       authDomain: "ripan-family-ledger.firebaseapp.com",
       projectId: "ripan-family-ledger",
       storageBucket: "ripan-family-ledger.firebasestorage.app",
       messagingSenderId: "698007584072",
       appId: "1:698007584072:web:f632ac6e2a4c82d194877d",
-      measurementId: "YOUR_MEASUREMENT_ID_HERE"
+      measurementId: "G-M5GXX1Q5W8"
     };
-
-    const hasValidApiKey =
-      firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_");
 
     let fbAuth = null;
     let fbDb = null;
 
-    if (hasValidApiKey) {
-      try {
-        const fbApp = initializeApp(firebaseConfig);
-        fbAuth = getAuth(fbApp);
-        fbDb = getFirestore(fbApp);
-        window.__FIREBASE_READY__ = true;
-      } catch (err) {
-        console.warn("Firebase init notice:", err);
-        window.__FIREBASE_READY__ = false;
+    try {
+      const app = initializeApp(firebaseConfig);
+      if (typeof window !== "undefined" && window.location.protocol !== "file:") {
+        try { getAnalytics(app); } catch (_) {}
       }
-    } else {
+      fbAuth = getAuth(app);
+      fbDb = getFirestore(app);
+      window.__FIREBASE_READY__ = true;
+    } catch (err) {
+      console.warn("Firebase init error:", err);
       window.__FIREBASE_READY__ = false;
     }
 
