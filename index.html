@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>পরিবারের হিসাব নিকাশ | Overseas Remittance & Family Ledger</title>
+  <title>হিসাব নিকাশ | Family & Personal Expense Ledger</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -117,7 +117,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen antialiased selection:bg-emerald-100 selection:text-emerald-900">
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-100 selection:text-emerald-900">
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3 sm:px-0"></div>
@@ -144,10 +144,10 @@
           </div>
           <div class="truncate">
             <h1 id="headerBrandTitle" class="text-sm sm:text-base font-bold text-slate-900 truncate">
-              পরিবারের হিসাব নিকাশ
+              হিসাব নিকাশ
             </h1>
             <p id="headerBrandSub" class="text-[11px] text-slate-500 truncate hidden sm:block">
-              প্রবাসী ভাইয়ের পাঠানো টাকার ও খরচের হিসাব
+              আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা
             </p>
           </div>
         </div>
@@ -202,14 +202,14 @@
         <div class="flex items-center gap-3 min-w-0">
           <img
             id="drawerAvatar"
-            src="https://placehold.co/96x96/059669/ffffff?text=RH"
-            onerror="this.src='https://placehold.co/96x96/059669/ffffff?text=RH'"
+            src="https://placehold.co/96x96/059669/ffffff?text=US"
+            onerror="this.src='https://placehold.co/96x96/059669/ffffff?text=US'"
             alt="Profile"
             class="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500/30 shrink-0"
           />
           <div class="min-w-0">
-            <p id="drawerUserName" class="text-sm font-bold text-slate-900 truncate">Ripan Halder</p>
-            <p id="drawerUserEmail" class="text-xs text-slate-500 truncate">ripanhalder2023@gmail.com</p>
+            <p id="drawerUserName" class="text-sm font-bold text-slate-900 truncate">Guest User</p>
+            <p id="drawerUserEmail" class="text-xs text-slate-500 truncate">user@example.com</p>
           </div>
         </div>
         <button
@@ -247,7 +247,7 @@
           class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100"
         >
           <i data-lucide="landmark" class="w-4 h-4 shrink-0"></i>
-          <span data-i18n="nav_account">একাউন্ট</span>
+          <span data-i18n="nav_account">একাউন্ট (ডিপোজিট)</span>
         </button>
 
         <button
@@ -267,7 +267,7 @@
           class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100"
         >
           <i data-lucide="book-open-check" class="w-4 h-4 shrink-0"></i>
-          <span data-i18n="nav_ledger">পরিবারের হিসাব নিকাশ</span>
+          <span data-i18n="nav_ledger">হিসাব নিকাশ ও রিপোর্ট</span>
         </button>
       </nav>
     </div>
@@ -287,12 +287,12 @@
   <!-- ===================================================================== -->
   <!-- MAIN CONTAINER                                                        -->
   <!-- ===================================================================== -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8">
 
     <!-- =================================================================== -->
-    <!-- LOGIN SCREEN (NO REGISTRATION BUTTON)                                 -->
+    <!-- LOGIN SCREEN (PUBLIC / FLEXIBLE ACCESS)                             -->
     <!-- =================================================================== -->
-    <section id="loginView" class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-4">
+    <section id="loginView" class="min-h-[calc(100vh-11rem)] flex items-center justify-center py-4">
       <div class="w-full max-w-md bg-white rounded-3xl shadow-soft border border-slate-200/80 overflow-hidden">
         <div class="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 px-6 sm:px-8 py-7 text-white">
           <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xs flex items-center justify-center mb-4">
@@ -302,7 +302,7 @@
             একাউন্টে লগইন করুন
           </h2>
           <p id="loginSubtitle" class="text-xs sm:text-sm text-emerald-100 mt-1.5 leading-relaxed">
-            প্রবাসী ভাইয়ের পাঠানো টাকা ও পরিবারের খরচের হিসাব পরিচালনা করতে লগইন করুন।
+            আপনার ডিপোজিট, আয় ও খরচের হিসাব সহজে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।
           </p>
         </div>
 
@@ -317,7 +317,7 @@
                 id="loginEmail"
                 type="email"
                 required
-                value="ripanhalder2023@gmail.com"
+                placeholder="name@example.com"
                 class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm text-slate-900 transition"
               />
             </div>
@@ -333,7 +333,6 @@
                 id="loginPassword"
                 type="password"
                 required
-                value="997722"
                 placeholder="••••••••"
                 class="w-full pl-10 pr-11 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm text-slate-900 transition"
               />
@@ -358,8 +357,17 @@
             <span data-i18n="login_btn">লগইন করুন</span>
           </button>
 
+          <button
+            type="button"
+            onclick="quickGuestLogin()"
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-[0.99]"
+          >
+            <i data-lucide="user-plus" class="w-4 h-4 text-emerald-700"></i>
+            <span data-i18n="guest_login_btn">দ্রুত গেস্ট একাউন্টে প্রবেশ করুন</span>
+          </button>
+
           <p id="loginFooterNote" class="text-center text-[11px] text-slate-400">
-            ব্যক্তিগত পারিবারিক হিসাব পোর্টাল • শুধুমাত্র অনুমোদিত লগইন
+            লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না
           </p>
         </form>
       </div>
@@ -390,7 +398,7 @@
         <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/75">
           <div class="flex items-center justify-between">
             <span data-i18n="stat_deposits" class="text-xs sm:text-sm font-semibold text-slate-600">
-              মোট ডিপোজিট (ভাইয়ের পাঠানো)
+              মোট ডিপোজিট / আয়
             </span>
             <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
@@ -425,10 +433,10 @@
               <span data-i18n="home_badge">হোম ড্যাশবোর্ড</span>
             </span>
             <h2 id="homeWelcomeTitle" class="text-xl sm:text-2xl font-bold text-slate-900">
-              স্বাগতম, Ripan Halder
+              স্বাগতম, Guest User
             </h2>
             <p id="homeWelcomeDesc" class="text-xs sm:text-sm text-slate-500 mt-1">
-              প্রবাসী ভাইয়ের পাঠানো টাকা ডিপোজিট করুন, প্রতিটি খরচের তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।
+              যেকোনো ডিপোজিট বা আয় যুক্ত করুন, খরচের বিস্তারিত তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।
             </p>
           </div>
 
@@ -487,7 +495,7 @@
               </div>
               <div>
                 <h2 data-i18n="deposit_form_title" class="text-base sm:text-lg font-bold text-slate-900">
-                  নতুন ডিপোজিট এন্ট্রি
+                  নতুন ডিপোজিট / আয় এন্ট্রি
                 </h2>
                 <p data-i18n="deposit_form_sub" class="text-xs text-slate-500">
                   ডিপোজিট সেভ করলে একাউন্ট ব্যালেন্সে টাকা যুক্ত হবে
@@ -525,13 +533,13 @@
 
               <div>
                 <label for="depositReference" class="block text-xs font-semibold text-slate-700 mb-1">
-                  <span data-i18n="field_reference">রেফারেন্স / পাঠানোর মাধ্যম</span>
+                  <span data-i18n="field_reference">রেফারেন্স / মাধ্যম</span>
                 </label>
                 <input
                   id="depositReference"
                   type="text"
                   data-i18n-placeholder="ph_deposit_ref"
-                  placeholder="যেমন: ভাইয়ের ব্যাংক ট্রান্সফার / বিকাশ #REF-101"
+                  placeholder="যেমন: ব্যাংক ট্রান্সফার / বিকাশ / নগদ #REF-101"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
               </div>
@@ -544,7 +552,7 @@
                   id="depositNote"
                   rows="2"
                   data-i18n-placeholder="ph_deposit_note"
-                  placeholder="যেমন: প্রবাসী ভাই পরিবারের খরচের জন্য পাঠিয়েছে"
+                  placeholder="যেমন: মাসিক ফান্ড / বেতন / রেমিট্যান্স / সঞ্চয়"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 ></textarea>
               </div>
@@ -604,7 +612,7 @@
                 মাই প্রোফাইল
               </h2>
               <p data-i18n="profile_card_sub" class="text-xs text-slate-500">
-                আপনার ছবি, নাম, ইমেইল ও প্রবাসী ভাইয়ের তথ্য সংরক্ষণ করুন
+                আপনার ছবি, নাম, ইমেইল ও একাউন্টের প্রয়োজনীয় তথ্য সংরক্ষণ করুন
               </p>
             </div>
           </div>
@@ -612,8 +620,8 @@
           <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
             <img
               id="profileAvatarPreview"
-              src="https://placehold.co/120x120/059669/ffffff?text=RH"
-              onerror="this.src='https://placehold.co/120x120/059669/ffffff?text=RH'"
+              src="https://placehold.co/120x120/059669/ffffff?text=US"
+              onerror="this.src='https://placehold.co/120x120/059669/ffffff?text=US'"
               alt="User Profile"
               class="w-20 h-20 rounded-2xl object-cover ring-2 ring-emerald-500/30 shadow-xs shrink-0"
             />
@@ -677,21 +685,21 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label for="brotherName" class="block text-xs font-semibold text-slate-700 mb-1">
-                  <span data-i18n="field_brother_name">প্রবাসী ভাইয়ের নাম</span>
+                <label for="ledgerBookTitle" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_book_title">হিসাবের খাতা / গ্রুপের নাম</span>
                 </label>
                 <input
-                  id="brotherName"
+                  id="ledgerBookTitle"
                   type="text"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
               </div>
               <div>
-                <label for="brotherCountry" class="block text-xs font-semibold text-slate-700 mb-1">
-                  <span data-i18n="field_brother_country">প্রবাসী দেশ / শহর</span>
+                <label for="userLocation" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_location">অবস্থান / শহর</span>
                 </label>
                 <input
-                  id="brotherCountry"
+                  id="userLocation"
                   type="text"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
@@ -723,7 +731,7 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- PAGE 4: পরিবারের হিসাব নিকাশ / FAMILY EXPENSE & LEDGER + PDF     -->
+      <!-- PAGE 4: হিসাব নিকাশ / EXPENSE & LEDGER + PDF                      -->
       <!-- ================================================================= -->
       <section id="page-ledger" class="page-section hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -764,7 +772,7 @@
                   type="text"
                   required
                   data-i18n-placeholder="ph_where"
-                  placeholder="যেমন: কাঁচাবাজার / স্থানীয় ফার্মেসি / স্কুল অফিস"
+                  placeholder="যেমন: বাজার / ফার্মেসি / দোকান / অফিস"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
               </div>
@@ -778,7 +786,7 @@
                   type="text"
                   required
                   data-i18n-placeholder="ph_for_whom"
-                  placeholder="যেমন: মা / বাবা / ছোট বোন / পুরো পরিবার"
+                  placeholder="যেমন: পরিবার / সদস্য / নিজের প্রয়োজনে"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
               </div>
@@ -792,7 +800,7 @@
                   type="text"
                   required
                   data-i18n-placeholder="ph_why"
-                  placeholder="যেমন: মাসের বাজার / ডাক্তার ও ঔষধ / বিদ্যুৎ বিল"
+                  placeholder="যেমন: বাজার সদাই / চিকিৎসা / বিল / যাতায়াত"
                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
                 />
               </div>
@@ -1054,7 +1062,7 @@
           <button
             type="button"
             onclick="closePdfModal()"
-            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+            class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
           >
             <span data-i18n="close_btn">বন্ধ করুন</span>
           </button>
@@ -1065,7 +1073,7 @@
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b-2 border-slate-800 pb-4">
           <div>
             <h2 id="pdfReportHeading" class="text-xl sm:text-2xl font-bold text-slate-900">
-              পরিবারের হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট
+              হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট
             </h2>
             <p id="pdfReportRangeText" class="text-xs sm:text-sm text-slate-600 mt-1">
               তারিখের পরিসীমা: সকল তারিখ
@@ -1114,14 +1122,30 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- FIREBASE SDK MODULE (Auth + Firestore + Analytics)                    -->
+  <!-- FOOTER CREATOR ATTRIBUTION                                          -->
+  <!-- ===================================================================== -->
+  <footer class="no-print bg-white border-t border-slate-200/80 py-5 px-4 text-center mt-8">
+    <p class="text-xs sm:text-sm font-semibold text-slate-800">
+      Website Creator By Emon Talukder
+    </p>
+    <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+      Sylhet, Sunamganj
+    </p>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- FIREBASE SDK MODULE (Lifetime Persistence + Auth + Firestore Sync)    -->
   <!-- ===================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-analytics.js";
     import {
       getAuth,
+      setPersistence,
+      browserLocalPersistence,
       signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
       signOut
     } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
     import {
@@ -1129,6 +1153,7 @@
       collection,
       doc,
       setDoc,
+      getDoc,
       deleteDoc,
       getDocs
     } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
@@ -1146,6 +1171,11 @@
     let fbAuth = null;
     let fbDb = null;
 
+    function getUserScopeKey(email) {
+      const clean = String(email || "public_guest").trim().toLowerCase().replace(/[^a-z0-9]/g, "_");
+      return `ledger_user_${clean}`;
+    }
+
     try {
       const app = initializeApp(firebaseConfig);
       if (typeof window !== "undefined" && window.location.protocol !== "file:") {
@@ -1153,9 +1183,10 @@
       }
       fbAuth = getAuth(app);
       fbDb = getFirestore(app);
+      setPersistence(fbAuth, browserLocalPersistence).catch(() => {});
       window.__FIREBASE_READY__ = true;
     } catch (err) {
-      console.warn("Firebase init error:", err);
+      console.warn("Firebase init notice:", err);
       window.__FIREBASE_READY__ = false;
     }
 
@@ -1166,9 +1197,18 @@
       async login(email, password) {
         if (!this.isReady()) return { ok: false, fallback: true };
         try {
-          await signInWithEmailAndPassword(fbAuth, email, password);
-          return { ok: true };
+          await setPersistence(fbAuth, browserLocalPersistence);
+          const cred = await signInWithEmailAndPassword(fbAuth, email, password);
+          return { ok: true, user: cred.user };
         } catch (err) {
+          if (err?.code === "auth/user-not-found" || err?.code === "auth/invalid-credential") {
+            try {
+              const created = await createUserWithEmailAndPassword(fbAuth, email, password);
+              return { ok: true, user: created.user, autoCreated: true };
+            } catch (createErr) {
+              return { ok: false, error: createErr };
+            }
+          }
           return { ok: false, error: err };
         }
       },
@@ -1178,82 +1218,103 @@
           await signOut(fbAuth);
         } catch (_) {}
       },
-      async loadTransactions() {
+      async loadUserData(email) {
         if (!this.isReady()) return null;
+        const scope = getUserScopeKey(email);
         try {
-          const snap = await getDocs(collection(fbDb, "ripan_family_transactions"));
+          const snap = await getDocs(collection(fbDb, scope, "items", "transactions"));
           const items = [];
           snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
-          return items;
+
+          const profSnap = await getDoc(doc(fbDb, scope, "meta", "profile"));
+          const profile = profSnap.exists() ? profSnap.data() : null;
+          return { transactions: items, profile };
         } catch (_) {
           return null;
         }
       },
-      async saveTransaction(entry) {
+      async saveTransaction(email, entry) {
         if (!this.isReady() || !entry?.id) return;
+        const scope = getUserScopeKey(email);
         try {
-          await setDoc(doc(fbDb, "ripan_family_transactions", entry.id), entry);
+          await setDoc(doc(fbDb, scope, "items", "transactions", entry.id), entry);
         } catch (_) {}
       },
-      async removeTransaction(id) {
+      async removeTransaction(email, id) {
         if (!this.isReady() || !id) return;
+        const scope = getUserScopeKey(email);
         try {
-          await deleteDoc(doc(fbDb, "ripan_family_transactions", id));
+          await deleteDoc(doc(fbDb, scope, "items", "transactions", id));
         } catch (_) {}
       },
-      async saveProfile(profileObj) {
+      async saveProfile(email, profileObj) {
         if (!this.isReady()) return;
+        const scope = getUserScopeKey(email);
         try {
-          await setDoc(doc(fbDb, "ripan_family_meta", "profile"), profileObj, { merge: true });
+          await setDoc(doc(fbDb, scope, "meta", "profile"), profileObj, { merge: true });
         } catch (_) {}
       }
     };
+
+    if (fbAuth) {
+      onAuthStateChanged(fbAuth, async (user) => {
+        if (user && user.email) {
+          window.dispatchEvent(new CustomEvent("firebase-auth-restored", { detail: { email: user.email } }));
+        }
+      });
+    }
 
     window.dispatchEvent(new Event("firebase-bridge-ready"));
   </script>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION JAVASCRIPT                                                -->
+  <!-- APPLICATION JAVASCRIPT (LIFETIME SESSION + PUBLIC MULTI-USER SUPPORT)  -->
   <!-- ===================================================================== -->
   <script>
+    const SESSION_STORAGE_KEY = 'ledger_lifetime_session_v1';
+    const DATA_STORE_PREFIX = 'ledger_public_store_v1_';
+    const DEFAULT_AVATAR = 'https://placehold.co/120x120/059669/ffffff?text=US';
+    const todayStr = () => new Date().toISOString().split('T')[0];
+
     const TRANSLATIONS = {
       bn: {
-        brand_title: 'পরিবারের হিসাব নিকাশ',
-        brand_sub: 'প্রবাসী ভাইয়ের পাঠানো টাকার ও খরচের হিসাব',
+        brand_title: 'হিসাব নিকাশ',
+        brand_sub: 'আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা',
         mode_local: 'লোকাল মোড',
         mode_firebase: 'ফায়ারবেস লাইভ',
         nav_home: 'হোম',
-        nav_account: 'একাউন্ট',
+        nav_account: 'একাউন্ট (ডিপোজিট)',
         nav_profile: 'মাই প্রোফাইল',
-        nav_ledger: 'পরিবারের হিসাব নিকাশ',
+        nav_ledger: 'হিসাব নিকাশ ও রিপোর্ট',
         logout_btn: 'লগ আউট',
         login_title: 'একাউন্টে লগইন করুন',
-        login_subtitle: 'প্রবাসী ভাইয়ের পাঠানো টাকা ও পরিবারের খরচের হিসাব পরিচালনা করতে লগইন করুন।',
+        login_subtitle: 'আপনার ডিপোজিট, আয় ও খরচের হিসাব সহজে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।',
         email_label: 'ইমেইল ঠিকানা',
         password_label: 'পাসওয়ার্ড',
         login_btn: 'লগইন করুন',
-        login_footer: 'ব্যক্তিগত পারিবারিক হিসাব পোর্টাল • শুধুমাত্র অনুমোদিত লগইন',
+        guest_login_btn: 'দ্রুত গেস্ট একাউন্টে প্রবেশ করুন',
+        login_footer: 'লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না',
         stat_balance: 'বর্তমান একাউন্ট ব্যালেন্স',
         stat_balance_sub: 'ডিপোজিট যুক্ত হয় এবং খরচ স্বয়ংক্রিয়ভাবে বাদ যায়',
-        stat_deposits: 'মোট ডিপোজিট (ভাইয়ের পাঠানো)',
+        stat_deposits: 'মোট ডিপোজিট / আয়',
         stat_expenses: 'মোট খরচ',
         home_badge: 'হোম ড্যাশবোর্ড',
         home_welcome_prefix: 'স্বাগতম,',
-        home_welcome_desc: 'প্রবাসী ভাইয়ের পাঠানো টাকা ডিপোজিট করুন, প্রতিটি খরচের তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।',
+        home_welcome_desc: 'যেকোনো ডিপোজিট বা আয় যুক্ত করুন, খরচের বিস্তারিত তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।',
         quick_deposit: 'ডিপোজিট যুক্ত করুন',
         quick_expense: 'খরচ এন্ট্রি করুন',
         recent_activity_title: 'সাম্প্রতিক লেনদেনসমূহ',
         recent_activity_sub: 'সর্বশেষ ডিপোজিট ও খরচের তালিকা (এডিট বা আপডেট করা যাবে)',
         view_all_ledger: 'সব হিসাব দেখুন',
-        deposit_form_title: 'নতুন ডিপোজিট এন্ট্রি',
+        deposit_form_title: 'নতুন ডিপোজিট / আয় এন্ট্রি',
         deposit_form_sub: 'ডিপোজিট সেভ করলে একাউন্ট ব্যালেন্সে টাকা যুক্ত হবে',
         field_date: 'তারিখ',
         field_amount: 'টাকার পরিমাণ',
-        field_reference: 'রেফারেন্স / পাঠানোর মাধ্যম',
+        field_reference: 'রেফারেন্স / মাধ্যম',
         field_reference_short: 'রেফারেন্স',
         field_note: 'বিবরণ / নোট',
-        ph_deposit_ref: 'যেমন: ভাইয়ের ব্যাংক ট্রান্সফার / বিকাশ #REF-101',
-        ph_deposit_note: 'যেমন: প্রবাসী ভাই পরিবারের খরচের জন্য পাঠিয়েছে',
+        ph_deposit_ref: 'যেমন: ব্যাংক ট্রান্সফার / বিকাশ / নগদ #REF-101',
+        ph_deposit_note: 'যেমন: মাসিক ফান্ড / বেতন / রেমিট্যান্স / সঞ্চয়',
         save_btn: 'সেভ করুন',
         account_history_title: 'একাউন্ট ডিপোজিট ও লেনদেন বিবরণী',
         account_history_sub: 'যেকোনো এন্ট্রি এডিট করলে ব্যালেন্স স্বয়ংক্রিয়ভাবে আপডেট হবে',
@@ -1262,14 +1323,14 @@
         type_deposit: 'ডিপোজিট',
         type_expense: 'খরচ',
         profile_card_title: 'মাই প্রোফাইল',
-        profile_card_sub: 'আপনার ছবি, নাম, ইমেইল ও প্রবাসী ভাইয়ের তথ্য সংরক্ষণ করুন',
+        profile_card_sub: 'আপনার ছবি, নাম, ইমেইল ও একাউন্টের প্রয়োজনীয় তথ্য সংরক্ষণ করুন',
         profile_photo_label: 'প্রোফাইল ছবি পরিবর্তন করুন',
         upload_photo_btn: 'ছবি আপলোড',
         reset_photo_btn: 'ডিফল্ট ছবি',
         field_full_name: 'পূর্ণ নাম',
         field_phone: 'মোবাইল নম্বর',
-        field_brother_name: 'প্রবাসী ভাইয়ের নাম',
-        field_brother_country: 'প্রবাসী দেশ / শহর',
+        field_book_title: 'হিসাবের খাতা / গ্রুপের নাম',
+        field_location: 'অবস্থান / শহর',
         field_new_password: 'লগইন পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)',
         ph_new_password: 'নতুন পাসওয়ার্ড দিতে চাইলে লিখুন',
         save_profile_btn: 'প্রোফাইল সেভ করুন',
@@ -1278,9 +1339,9 @@
         field_where: 'কোথায় খরচ করেছি',
         field_for_whom: 'কার জন্য খরচ করেছি',
         field_why: 'কেন খরচ করেছি',
-        ph_where: 'যেমন: কাঁচাবাজার / ফার্মেসি / স্কুল অফিস',
-        ph_for_whom: 'যেমন: মা / বাবা / ছোট বোন / পরিবার',
-        ph_why: 'যেমন: মাসের বাজার / ঔষধ / বিদ্যুৎ বিল',
+        ph_where: 'যেমন: বাজার / ফার্মেসি / দোকান / অফিস',
+        ph_for_whom: 'যেমন: পরিবার / সদস্য / নিজের প্রয়োজনে',
+        ph_why: 'যেমন: বাজার সদাই / চিকিৎসা / বিল / যাতায়াত',
         ph_exp_ref: 'যেমন: ভাউচার #১২ / ক্যাশ',
         date_filter_pdf_title: 'তারিখ বাই তারিখ ফিল্টার ও PDF রিপোর্ট',
         export_pdf_btn: 'তারিখ বাই তারিখ PDF',
@@ -1301,12 +1362,12 @@
         pdf_modal_title: 'তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ',
         print_save_pdf_btn: 'প্রিন্ট / PDF সেভ করুন',
         close_btn: 'বন্ধ করুন',
-        pdf_heading: 'পরিবারের হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট',
+        pdf_heading: 'হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট',
         pdf_sum_dep: 'মোট ডিপোজিট',
         pdf_sum_exp: 'মোট খরচ',
         pdf_sum_bal: 'অবশিষ্ট ব্যালেন্স',
         toast_login_ok: 'সফলভাবে লগইন করা হয়েছে!',
-        toast_login_err: 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।',
+        toast_login_err: 'সঠিক ইমেইল ও পাসওয়ার্ড দিন।',
         toast_logout_ok: 'আপনি লগ আউট করেছেন।',
         toast_dep_saved: 'ডিপোজিট সেভ হয়েছে এবং ব্যালেন্স বৃদ্ধি পেয়েছে।',
         toast_exp_saved: 'খরচ এন্ট্রি সেভ হয়েছে এবং ব্যালেন্স থেকে টাকা মাইনাস হয়েছে।',
@@ -1316,42 +1377,43 @@
         empty_entries: 'কোনো লেনদেন পাওয়া যায়নি।'
       },
       en: {
-        brand_title: 'Family Remittance Ledger',
-        brand_sub: 'Overseas brother remittance & family expense tracker',
+        brand_title: 'Expense Ledger',
+        brand_sub: 'Deposit, income & expense tracking portal',
         mode_local: 'Local Mode',
         mode_firebase: 'Firebase Live',
         nav_home: 'Home',
-        nav_account: 'Account',
+        nav_account: 'Account (Deposits)',
         nav_profile: 'My Profile',
-        nav_ledger: 'Family Ledger',
+        nav_ledger: 'Ledger & PDF Report',
         logout_btn: 'Logout',
         login_title: 'Sign In to Account',
-        login_subtitle: 'Log in to manage money sent by your overseas brother and track family expenses.',
+        login_subtitle: 'Log in to manage your deposits, funds, and daily expenses with instant date-by-date PDF reports.',
         email_label: 'Email Address',
         password_label: 'Password',
         login_btn: 'Login',
-        login_footer: 'Personal Family Accounting Portal • Authorized Login Only',
+        guest_login_btn: 'Continue with Quick Guest Account',
+        login_footer: 'Lifetime Login Enabled • Stays signed in after page refresh',
         stat_balance: 'Current Account Balance',
         stat_balance_sub: 'Deposits add funds; expenses automatically deduct',
-        stat_deposits: 'Total Deposits (From Brother)',
+        stat_deposits: 'Total Deposits / Income',
         stat_expenses: 'Total Expenses',
         home_badge: 'Home Dashboard',
         home_welcome_prefix: 'Welcome,',
-        home_welcome_desc: 'Record deposits sent from abroad, log every expense with where, for whom, why, and reference, and export date-by-date PDF reports.',
+        home_welcome_desc: 'Add deposits or funds, log every expense with where, for whom, why, and reference, and export date-by-date PDF reports.',
         quick_deposit: 'Add Deposit',
         quick_expense: 'Add Expense',
         recent_activity_title: 'Recent Transactions',
         recent_activity_sub: 'Latest deposits and expenses (click Edit to update any record)',
         view_all_ledger: 'View Full Ledger',
-        deposit_form_title: 'New Deposit Entry',
+        deposit_form_title: 'New Deposit / Fund Entry',
         deposit_form_sub: 'Saving a deposit increases your account balance',
         field_date: 'Date',
         field_amount: 'Amount',
-        field_reference: 'Reference / Transfer Channel',
+        field_reference: 'Reference / Channel',
         field_reference_short: 'Reference',
         field_note: 'Details / Note',
-        ph_deposit_ref: 'e.g. Bank Transfer / bKash #REF-101',
-        ph_deposit_note: 'e.g. Sent by brother for family expenses',
+        ph_deposit_ref: 'e.g. Bank Transfer / Mobile Banking #REF-101',
+        ph_deposit_note: 'e.g. Monthly budget / Savings / Fund transfer',
         save_btn: 'Save',
         account_history_title: 'Account Deposits & Transactions',
         account_history_sub: 'Editing or deleting any entry automatically recalculates balance',
@@ -1360,14 +1422,14 @@
         type_deposit: 'Deposit',
         type_expense: 'Expense',
         profile_card_title: 'My Profile',
-        profile_card_sub: 'Manage your photo, profile details, and overseas brother info',
+        profile_card_sub: 'Manage your photo, profile details, and ledger settings',
         profile_photo_label: 'Update Profile Photo',
         upload_photo_btn: 'Upload Photo',
         reset_photo_btn: 'Default Avatar',
         field_full_name: 'Full Name',
         field_phone: 'Phone Number',
-        field_brother_name: 'Overseas Brother Name',
-        field_brother_country: 'Country / City',
+        field_book_title: 'Ledger / Group Name',
+        field_location: 'Location / City',
         field_new_password: 'Change Login Password (Optional)',
         ph_new_password: 'Enter new password to update',
         save_profile_btn: 'Save Profile',
@@ -1376,9 +1438,9 @@
         field_where: 'Where Spent',
         field_for_whom: 'For Whom',
         field_why: 'Why Spent',
-        ph_where: 'e.g. Grocery Market / Pharmacy / School',
-        ph_for_whom: 'e.g. Mother / Father / Sister / Family',
-        ph_why: 'e.g. Monthly groceries / Medicine / Utility bill',
+        ph_where: 'e.g. Market / Pharmacy / Shop / Office',
+        ph_for_whom: 'e.g. Family / Member / Personal',
+        ph_why: 'e.g. Groceries / Medical / Bills / Travel',
         ph_exp_ref: 'e.g. Voucher #12 / Cash',
         date_filter_pdf_title: 'Date-by-Date Filter & PDF Report',
         export_pdf_btn: 'Date-by-Date PDF',
@@ -1389,7 +1451,7 @@
         opt_expense: 'Expenses Only',
         opt_deposit: 'Deposits Only',
         clear_filter_btn: 'Reset',
-        full_ledger_title: 'Complete Family Expense & Deposit Ledger',
+        full_ledger_title: 'Complete Expense & Deposit Ledger',
         edit_modal_title: 'Edit & Update Entry',
         cancel_btn: 'Cancel',
         update_btn: 'Save Update',
@@ -1399,12 +1461,12 @@
         pdf_modal_title: 'Date-by-Date PDF Report Preview',
         print_save_pdf_btn: 'Print / Save PDF',
         close_btn: 'Close',
-        pdf_heading: 'Family Remittance & Expense Statement — Date-by-Date',
+        pdf_heading: 'Expense Ledger Statement — Date-by-Date',
         pdf_sum_dep: 'Total Deposits',
         pdf_sum_exp: 'Total Expenses',
         pdf_sum_bal: 'Net Balance',
         toast_login_ok: 'Logged in successfully!',
-        toast_login_err: 'Invalid email or password.',
+        toast_login_err: 'Please enter a valid email and password.',
         toast_logout_ok: 'You have been logged out.',
         toast_dep_saved: 'Deposit saved and added to account balance.',
         toast_exp_saved: 'Expense saved and deducted from account balance.',
@@ -1415,73 +1477,126 @@
       }
     };
 
-    const DEFAULT_AVATAR = 'https://placehold.co/120x120/059669/ffffff?text=RH';
-    const todayStr = () => new Date().toISOString().split('T')[0];
+    const DEFAULT_TRANSACTIONS = [
+      {
+        id: 'tx-sample-1',
+        type: 'deposit',
+        date: todayStr(),
+        amount: 25000,
+        reference: 'DEP-001',
+        where: '-',
+        forWhom: '-',
+        why: 'প্রারম্ভিক ডিপোজিট / ফান্ড',
+        note: 'প্রারম্ভিক ডিপোজিট / ফান্ড'
+      },
+      {
+        id: 'tx-sample-2',
+        type: 'expense',
+        date: todayStr(),
+        amount: 1200,
+        reference: 'EXP-001',
+        where: 'স্থানীয় বাজার',
+        forWhom: 'পরিবার',
+        why: 'দৈনন্দিন বাজার ও প্রয়োজনীয় সামগ্রী',
+        note: 'দৈনন্দিন বাজার ও প্রয়োজনীয় সামগ্রী'
+      }
+    ];
 
     const appState = {
       lang: 'bn',
       isLoggedIn: false,
       activePage: 'home',
-      credentials: {
-        email: 'ripanhalder2023@gmail.com',
-        password: '997722'
-      },
+      userEmail: 'guest@ledger.local',
+      passwordMap: {},
       profile: {
-        name: 'Ripan Halder',
-        email: 'ripanhalder2023@gmail.com',
-        phone: '+880 1700-000000',
-        brotherName: 'প্রবাসী ভাই',
-        brotherCountry: 'Overseas',
+        name: 'Guest User',
+        email: 'guest@ledger.local',
+        phone: '',
+        bookTitle: 'হিসাবের খাতা',
+        location: '',
         avatar: DEFAULT_AVATAR
       },
-      transactions: [
-        {
-          id: 'tx-101',
-          type: 'deposit',
-          date: '2026-11-01',
-          amount: 85000,
-          reference: 'REM-SA-88412 (Bank Transfer)',
-          where: '-',
-          forWhom: '-',
-          why: 'প্রবাসী ভাই নভেম্বরের পারিবারিক খরচ ও জরুরি প্রয়োজনে পাঠিয়েছে',
-          note: 'প্রবাসী ভাই নভেম্বরের পারিবারিক খরচ ও জরুরি প্রয়োজনে পাঠিয়েছে'
-        },
-        {
-          id: 'tx-102',
-          type: 'expense',
-          date: '2026-11-03',
-          amount: 14500,
-          reference: 'VCH-001',
-          where: 'কাঁচাবাজার ও সুপারশপ',
-          forWhom: 'পুরো পরিবার',
-          why: 'মাসের চাল, ডাল, তেল ও নিত্যপ্রয়োজনীয় বাজার',
-          note: 'মাসের চাল, ডাল, তেল ও নিত্যপ্রয়োজনীয় বাজার'
-        },
-        {
-          id: 'tx-103',
-          type: 'expense',
-          date: '2026-11-08',
-          amount: 6200,
-          reference: 'MED-409',
-          where: 'সিটি ফার্মেসি ও ডায়াগনস্টিক',
-          forWhom: 'মা',
-          why: 'ব্লাড প্রেসার ও নিয়মিত মাসিক ঔষধ',
-          note: 'ব্লাড প্রেসার ও নিয়মিত মাসিক ঔষধ'
-        },
-        {
-          id: 'tx-104',
-          type: 'expense',
-          date: '2026-11-15',
-          amount: 8000,
-          reference: 'SCH-221',
-          where: 'সেন্ট্রাল স্কুল অফিস',
-          forWhom: 'ছোট বোন',
-          why: 'নভেম্বর মাসের টিউশন ফি ও পরীক্ষার ফর্ম',
-          note: 'নভেম্বর মাসের টিউশন ফি ও পরীক্ষার ফর্ম'
-        }
-      ],
+      transactions: [...DEFAULT_TRANSACTIONS],
       pendingDeleteId: null
     };
+
+    function getUserStorageKey(email) {
+      const clean = String(email || 'guest@ledger.local').trim().toLowerCase();
+      return DATA_STORE_PREFIX + clean;
+    }
+
+    function loadUserLocalRecord(email) {
+      try {
+        const raw = localStorage.getItem(getUserStorageKey(email));
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function saveUserLocalRecord() {
+      try {
+        const payload = {
+          password: appState.passwordMap[appState.userEmail] || '',
+          profile: appState.profile,
+          transactions: appState.transactions
+        };
+        localStorage.setItem(getUserStorageKey(appState.userEmail), JSON.stringify(payload));
+      } catch (_) {}
+    }
+
+    function persistLifetimeSession(loggedIn, email) {
+      try {
+        if (loggedIn && email) {
+          localStorage.setItem(
+            SESSION_STORAGE_KEY,
+            JSON.stringify({ isLoggedIn: true, email: email.trim().toLowerCase(), lang: appState.lang })
+          );
+        } else {
+          localStorage.removeItem(SESSION_STORAGE_KEY);
+        }
+      } catch (_) {}
+    }
+
+    function hydrateUserState(email) {
+      const cleanEmail = String(email || 'guest@ledger.local').trim().toLowerCase();
+      appState.userEmail = cleanEmail;
+      const saved = loadUserLocalRecord(cleanEmail);
+
+      if (saved) {
+        if (saved.password) appState.passwordMap[cleanEmail] = saved.password;
+        appState.profile = {
+          name: saved.profile?.name || cleanEmail.split('@')[0],
+          email: cleanEmail,
+          phone: saved.profile?.phone || '',
+          bookTitle: saved.profile?.bookTitle || 'হিসাবের খাতা',
+          location: saved.profile?.location || '',
+          avatar: saved.profile?.avatar || DEFAULT_AVATAR
+        };
+        appState.transactions = Array.isArray(saved.transactions) ? saved.transactions : [...DEFAULT_TRANSACTIONS];
+      } else {
+        appState.profile = {
+          name: cleanEmail.split('@')[0] || 'User',
+          email: cleanEmail,
+          phone: '',
+          bookTitle: 'হিসাবের খাতা',
+          location: '',
+          avatar: DEFAULT_AVATAR
+        };
+        appState.transactions = [...DEFAULT_TRANSACTIONS];
+        saveUserLocalRecord();
+      }
+    }
+
+    function activateAuthenticatedUI(pageToOpen = 'home') {
+      appState.isLoggedIn = true;
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      document.getElementById('menuToggleBtn').classList.remove('hidden');
+      syncProfileToUI();
+      navigateTo(pageToOpen);
+    }
 
     function refreshModeBadge() {
       const isLive = Boolean(window.firebaseBridge && window.firebaseBridge.isReady());
@@ -1543,6 +1658,10 @@
         if (t[key]) el.placeholder = t[key];
       });
 
+      if (appState.isLoggedIn) {
+        persistLifetimeSession(true, appState.userEmail);
+      }
+
       updateWelcomeName();
       renderAllViews();
     }
@@ -1560,53 +1679,69 @@
       return (val < 0 ? '-' : '') + '৳' + formatted;
     }
 
-    async function handleLoginSubmit(e) {
-      e.preventDefault();
-      const emailInput = document.getElementById('loginEmail').value.trim();
-      const passInput = document.getElementById('loginPassword').value;
+    async function completeSignIn(email, password, showWelcomeToast = true) {
+      const cleanEmail = email.trim().toLowerCase();
       const errBox = document.getElementById('loginErrorMsg');
 
-      if (!emailInput || !passInput) {
+      if (!cleanEmail || !password) {
         errBox.textContent = tText('toast_login_err');
         errBox.classList.remove('hidden');
         return;
       }
 
+      const existing = loadUserLocalRecord(cleanEmail);
+      if (existing && existing.password && existing.password !== password) {
+        errBox.textContent = tText('toast_login_err');
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      hydrateUserState(cleanEmail);
+      appState.passwordMap[cleanEmail] = password;
+      saveUserLocalRecord();
+      persistLifetimeSession(true, cleanEmail);
+
       if (window.firebaseBridge && window.firebaseBridge.isReady()) {
-        const res = await window.firebaseBridge.login(emailInput, passInput);
-        if (!res.ok) {
-          errBox.textContent = tText('toast_login_err');
-          errBox.classList.remove('hidden');
-          return;
-        }
-        const cloudItems = await window.firebaseBridge.loadTransactions();
-        if (Array.isArray(cloudItems) && cloudItems.length) {
-          appState.transactions = cloudItems;
-        }
-      } else {
-        if (passInput !== appState.credentials.password) {
-          errBox.textContent = tText('toast_login_err');
-          errBox.classList.remove('hidden');
-          return;
+        const res = await window.firebaseBridge.login(cleanEmail, password);
+        if (res.ok) {
+          const cloudData = await window.firebaseBridge.loadUserData(cleanEmail);
+          if (cloudData) {
+            if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
+              appState.transactions = cloudData.transactions;
+            }
+            if (cloudData.profile) {
+              appState.profile = { ...appState.profile, ...cloudData.profile, email: cleanEmail };
+            }
+            saveUserLocalRecord();
+          }
         }
       }
 
-      appState.credentials.email = emailInput;
-      appState.profile.email = emailInput;
       errBox.classList.add('hidden');
-      appState.isLoggedIn = true;
+      activateAuthenticatedUI('home');
+      if (showWelcomeToast) {
+        showToast(tText('toast_login_ok'), 'success');
+      }
+    }
 
-      document.getElementById('loginView').classList.add('hidden');
-      document.getElementById('appShell').classList.remove('hidden');
-      document.getElementById('menuToggleBtn').classList.remove('hidden');
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('loginEmail').value.trim();
+      const passInput = document.getElementById('loginPassword').value;
+      await completeSignIn(emailInput, passInput, true);
+    }
 
-      syncProfileToUI();
-      navigateTo('home');
-      showToast(tText('toast_login_ok'), 'success');
+    async function quickGuestLogin() {
+      const guestEmail = 'guest@ledger.local';
+      const guestPass = 'guest1234';
+      document.getElementById('loginEmail').value = guestEmail;
+      document.getElementById('loginPassword').value = guestPass;
+      await completeSignIn(guestEmail, guestPass, true);
     }
 
     async function handleLogout() {
       toggleSidebar(false);
+      persistLifetimeSession(false, '');
       if (window.firebaseBridge) {
         await window.firebaseBridge.logout();
       }
@@ -1614,9 +1749,6 @@
       document.getElementById('appShell').classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
       document.getElementById('menuToggleBtn').classList.add('hidden');
-
-      document.getElementById('loginEmail').value = appState.credentials.email;
-      document.getElementById('loginPassword').value = appState.credentials.password;
       showToast(tText('toast_logout_ok'), 'info');
     }
 
@@ -1712,11 +1844,12 @@
       };
 
       appState.transactions.unshift(newEntry);
+      saveUserLocalRecord();
       document.getElementById('depositForm').reset();
       document.getElementById('depositDate').value = todayStr();
 
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(newEntry);
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
       showToast(tText('toast_dep_saved'), 'success');
     }
 
@@ -1744,11 +1877,12 @@
       };
 
       appState.transactions.unshift(newEntry);
+      saveUserLocalRecord();
       document.getElementById('expenseForm').reset();
       document.getElementById('expDate').value = todayStr();
 
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(newEntry);
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
       showToast(tText('toast_exp_saved'), 'success');
     }
 
@@ -1821,9 +1955,10 @@
       }
 
       appState.transactions[idx] = updated;
+      saveUserLocalRecord();
       closeEditModal();
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(updated);
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(appState.userEmail, updated);
       showToast(tText('toast_updated'), 'success');
     }
 
@@ -1846,9 +1981,10 @@
       if (!id) return;
 
       appState.transactions = appState.transactions.filter((t) => t.id !== id);
+      saveUserLocalRecord();
       closeDeleteModal();
       renderAllViews();
-      if (window.firebaseBridge) await window.firebaseBridge.removeTransaction(id);
+      if (window.firebaseBridge) await window.firebaseBridge.removeTransaction(appState.userEmail, id);
       showToast(tText('toast_deleted'), 'info');
     }
 
@@ -2066,10 +2202,10 @@
       document.getElementById('pdfReportRangeText').textContent =
         (isBn ? 'তারিখের পরিসীমা: ' : 'Date Range: ') + rangeLabel;
 
+      const bookInfo = appState.profile.bookTitle ? ` • ${appState.profile.bookTitle}` : '';
+      const locInfo = appState.profile.location ? ` (${appState.profile.location})` : '';
       document.getElementById('pdfReportUserMeta').textContent =
-        `${appState.profile.name} (${appState.profile.email}) • ${
-          isBn ? 'প্রবাসী ভাই: ' : 'Brother: '
-        }${appState.profile.brotherName} [${appState.profile.brotherCountry}]`;
+        `${appState.profile.name} (${appState.profile.email})${bookInfo}${locInfo}`;
 
       document.getElementById('pdfGeneratedDateLabel').textContent =
         (isBn ? 'রিপোর্ট তৈরির তারিখ: ' : 'Generated: ') + todayStr();
@@ -2121,22 +2257,22 @@
     }
 
     function syncProfileToUI() {
-      document.getElementById('profileName').value = appState.profile.name;
-      document.getElementById('profileEmail').value = appState.profile.email;
-      document.getElementById('profilePhone').value = appState.profile.phone;
-      document.getElementById('brotherName').value = appState.profile.brotherName;
-      document.getElementById('brotherCountry').value = appState.profile.brotherCountry;
+      document.getElementById('profileName').value = appState.profile.name || '';
+      document.getElementById('profileEmail').value = appState.profile.email || '';
+      document.getElementById('profilePhone').value = appState.profile.phone || '';
+      document.getElementById('ledgerBookTitle').value = appState.profile.bookTitle || '';
+      document.getElementById('userLocation').value = appState.profile.location || '';
       document.getElementById('profileAvatarPreview').src = appState.profile.avatar || DEFAULT_AVATAR;
       document.getElementById('drawerAvatar').src = appState.profile.avatar || DEFAULT_AVATAR;
-      document.getElementById('drawerUserName').textContent = appState.profile.name;
-      document.getElementById('drawerUserEmail').textContent = appState.profile.email;
+      document.getElementById('drawerUserName').textContent = appState.profile.name || 'User';
+      document.getElementById('drawerUserEmail').textContent = appState.profile.email || '';
       updateWelcomeName();
     }
 
     function updateWelcomeName() {
       const prefix = TRANSLATIONS[appState.lang].home_welcome_prefix;
       const el = document.getElementById('homeWelcomeTitle');
-      if (el) el.textContent = `${prefix} ${appState.profile.name}`;
+      if (el) el.textContent = `${prefix} ${appState.profile.name || 'User'}`;
     }
 
     function handlePhotoUpload(e) {
@@ -2148,6 +2284,7 @@
         appState.profile.avatar = dataUrl;
         document.getElementById('profileAvatarPreview').src = dataUrl;
         document.getElementById('drawerAvatar').src = dataUrl;
+        saveUserLocalRecord();
       };
       reader.readAsDataURL(file);
     }
@@ -2156,25 +2293,33 @@
       appState.profile.avatar = DEFAULT_AVATAR;
       document.getElementById('profileAvatarPreview').src = DEFAULT_AVATAR;
       document.getElementById('drawerAvatar').src = DEFAULT_AVATAR;
+      saveUserLocalRecord();
     }
 
     async function handleProfileSave(e) {
       e.preventDefault();
+      const oldEmail = appState.userEmail;
+      const nextEmail = (document.getElementById('profileEmail').value.trim() || oldEmail).toLowerCase();
+
       appState.profile.name = document.getElementById('profileName').value.trim() || appState.profile.name;
-      appState.profile.email = document.getElementById('profileEmail').value.trim() || appState.profile.email;
+      appState.profile.email = nextEmail;
       appState.profile.phone = document.getElementById('profilePhone').value.trim();
-      appState.profile.brotherName = document.getElementById('brotherName').value.trim();
-      appState.profile.brotherCountry = document.getElementById('brotherCountry').value.trim();
-      appState.credentials.email = appState.profile.email;
+      appState.profile.bookTitle = document.getElementById('ledgerBookTitle').value.trim();
+      appState.profile.location = document.getElementById('userLocation').value.trim();
 
       const newPass = document.getElementById('newAccountPassword').value;
       if (newPass && newPass.trim().length >= 4) {
-        appState.credentials.password = newPass.trim();
+        appState.passwordMap[nextEmail] = newPass.trim();
         document.getElementById('newAccountPassword').value = '';
+      } else if (!appState.passwordMap[nextEmail] && appState.passwordMap[oldEmail]) {
+        appState.passwordMap[nextEmail] = appState.passwordMap[oldEmail];
       }
 
+      appState.userEmail = nextEmail;
+      persistLifetimeSession(true, nextEmail);
+      saveUserLocalRecord();
       syncProfileToUI();
-      if (window.firebaseBridge) await window.firebaseBridge.saveProfile(appState.profile);
+      if (window.firebaseBridge) await window.firebaseBridge.saveProfile(nextEmail, appState.profile);
       showToast(tText('toast_profile_saved'), 'success');
     }
 
@@ -2208,12 +2353,48 @@
 
     window.addEventListener('firebase-bridge-ready', refreshModeBadge);
 
+    window.addEventListener('firebase-auth-restored', async (evt) => {
+      const restoredEmail = evt?.detail?.email;
+      if (!restoredEmail) return;
+      hydrateUserState(restoredEmail);
+      persistLifetimeSession(true, restoredEmail);
+      if (window.firebaseBridge && window.firebaseBridge.isReady()) {
+        const cloudData = await window.firebaseBridge.loadUserData(restoredEmail);
+        if (cloudData) {
+          if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
+            appState.transactions = cloudData.transactions;
+          }
+          if (cloudData.profile) {
+            appState.profile = { ...appState.profile, ...cloudData.profile, email: restoredEmail };
+          }
+          saveUserLocalRecord();
+        }
+      }
+      activateAuthenticatedUI(appState.activePage || 'home');
+    });
+
     window.addEventListener('DOMContentLoaded', () => {
       const today = todayStr();
       document.getElementById('depositDate').value = today;
       document.getElementById('expDate').value = today;
-      syncProfileToUI();
-      setLanguage('bn');
+
+      let restoredSession = null;
+      try {
+        const rawSession = localStorage.getItem(SESSION_STORAGE_KEY);
+        if (rawSession) restoredSession = JSON.parse(rawSession);
+      } catch (_) {}
+
+      const initialLang = restoredSession?.lang === 'en' ? 'en' : 'bn';
+      setLanguage(initialLang);
+
+      if (restoredSession && restoredSession.isLoggedIn && restoredSession.email) {
+        hydrateUserState(restoredSession.email);
+        document.getElementById('loginEmail').value = restoredSession.email;
+        activateAuthenticatedUI('home');
+      } else {
+        syncProfileToUI();
+      }
+
       lucide.createIcons();
     });
   </script>
