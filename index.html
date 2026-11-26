@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="bn" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>পরিবারের হিসাব নিকাশ | Overseas Remittance & Family Ledger</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Noto Sans Bengali, Hind Siliguri, Plus Jakarta Sans, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            bn: ['"Noto Sans Bengali"', '"Hind Siliguri"', 'sans-serif'],
+            en: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          },
+          boxShadow: {
+            soft: '0 8px 30px -6px rgba(15, 23, 42, 0.08)',
+            card: '0 2px 12px -2px rgba(15, 23, 42, 0.06), 0 0 1px 1px rgba(15, 23, 42, 0.04)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --font-active: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+    }
+    body {
+      font-family: var(--font-active);
+      background-color: #f4f7f6;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
+    body.lang-en {
+      --font-active: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sidebar-overlay {
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .sidebar-panel {
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #pdfReportPrintArea,
+      #pdfReportPrintArea * {
+        visibility: visible !important;
+      }
+      #pdfReportPrintArea {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 18px !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        border: none !important;
+        z-index: 99999 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3 sm:px-0"></div>
+
+  <!-- ===================================================================== -->
+  <!-- TOP NAVIGATION BAR                                                    -->
+  <!-- ===================================================================== -->
+  <header id="topHeader" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <button
+          id="menuToggleBtn"
+          type="button"
+          onclick="toggleSidebar(true)"
+          aria-label="Toggle Menu"
+          class="hidden p-2.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-200/70 transition active:scale-95 shrink-0"
+        >
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-sm shrink-0">
+            <i data-lucide="wallet-cards" class="w-5 h-5"></i>
+          </div>
+          <div class="truncate">
+            <h1 id="headerBrandTitle" class="text-sm sm:text-base font-bold text-slate-900 truncate">
+              পরিবারের হিসাব নিকাশ
+            </h1>
+            <p id="headerBrandSub" class="text-[11px] text-slate-500 truncate hidden sm:block">
+              প্রবাসী ভাইয়ের পাঠানো টাকার ও খরচের হিসাব
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span
+          id="modeBadge"
+          class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200/80"
+        >
+          <span id="modeBadgeDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span id="modeBadgeText">লোকাল মোড</span>
+        </span>
+
+        <div class="inline-flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+          <button
+            id="langBnBtn"
+            type="button"
+            onclick="setLanguage('bn')"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-emerald-600 text-white shadow-xs"
+          >
+            বাংলা
+          </button>
+          <button
+            id="langEnBtn"
+            type="button"
+            onclick="setLanguage('en')"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900"
+          >
+            English
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- TOP-LEFT SLIDE-OUT SIDEBAR DRAWER                                     -->
+  <!-- ===================================================================== -->
+  <div
+    id="sidebarOverlay"
+    onclick="toggleSidebar(false)"
+    class="sidebar-overlay fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[2px] opacity-0 invisible"
+  ></div>
+
+  <aside
+    id="sidebarDrawer"
+    class="sidebar-panel fixed top-0 left-0 z-50 h-full w-80 max-w-[86vw] bg-white border-r border-slate-200 shadow-2xl -translate-x-full flex flex-col justify-between"
+  >
+    <div>
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50/70 to-teal-50/40">
+        <div class="flex items-center gap-3 min-w-0">
+          <img
+            id="drawerAvatar"
+            src="https://placehold.co/96x96/059669/ffffff?text=RH"
+            onerror="this.src='https://placehold.co/96x96/059669/ffffff?text=RH'"
+            alt="Profile"
+            class="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500/30 shrink-0"
+          />
+          <div class="min-w-0">
+            <p id="drawerUserName" class="text-sm font-bold text-slate-900 truncate">Ripan Halder</p>
+            <p id="drawerUserEmail" class="text-xs text-slate-500 truncate">ripanhalder2023@gmail.com</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onclick="toggleSidebar(false)"
+          class="p-2 rounded-lg text-slate-500 hover:bg-white hover:text-slate-800 transition"
+          aria-label="Close Menu"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mx-4 mt-4 p-3.5 rounded-2xl bg-slate-900 text-white shadow-sm">
+        <p id="drawerBalanceLabel" class="text-[11px] uppercase tracking-wider text-emerald-300/90 font-medium">
+          বর্তমান একাউন্ট ব্যালেন্স
+        </p>
+        <p id="drawerBalanceValue" class="text-xl font-bold mt-0.5 tabular-nums text-white">৳০.০০</p>
+      </div>
+
+      <nav class="p-3 sm:p-4 space-y-1.5 mt-1">
+        <button
+          type="button"
+          data-nav="home"
+          onclick="navigateTo('home')"
+          class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition bg-emerald-600 text-white shadow-xs"
+        >
+          <i data-lucide="home" class="w-4 h-4 shrink-0"></i>
+          <span data-i18n="nav_home">হোম</span>
+        </button>
+
+        <button
+          type="button"
+          data-nav="account"
+          onclick="navigateTo('account')"
+          class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100"
+        >
+          <i data-lucide="landmark" class="w-4 h-4 shrink-0"></i>
+          <span data-i18n="nav_account">একাউন্ট</span>
+        </button>
+
+        <button
+          type="button"
+          data-nav="profile"
+          onclick="navigateTo('profile')"
+          class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100"
+        >
+          <i data-lucide="user-circle" class="w-4 h-4 shrink-0"></i>
+          <span data-i18n="nav_profile">মাই প্রোফাইল</span>
+        </button>
+
+        <button
+          type="button"
+          data-nav="ledger"
+          onclick="navigateTo('ledger')"
+          class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100"
+        >
+          <i data-lucide="book-open-check" class="w-4 h-4 shrink-0"></i>
+          <span data-i18n="nav_ledger">পরিবারের হিসাব নিকাশ</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-slate-100 bg-slate-50/70">
+      <button
+        type="button"
+        onclick="handleLogout()"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition active:scale-[0.99]"
+      >
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        <span data-i18n="logout_btn">লগ আউট</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTAINER                                                        -->
+  <!-- ===================================================================== -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
+
+    <!-- =================================================================== -->
+    <!-- LOGIN SCREEN (NO REGISTRATION BUTTON)                                 -->
+    <!-- =================================================================== -->
+    <section id="loginView" class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-4">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-soft border border-slate-200/80 overflow-hidden">
+        <div class="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 px-6 sm:px-8 py-7 text-white">
+          <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-xs flex items-center justify-center mb-4">
+            <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+          </div>
+          <h2 id="loginTitle" class="text-xl sm:text-2xl font-bold tracking-tight">
+            একাউন্টে লগইন করুন
+          </h2>
+          <p id="loginSubtitle" class="text-xs sm:text-sm text-emerald-100 mt-1.5 leading-relaxed">
+            প্রবাসী ভাইয়ের পাঠানো টাকা ও পরিবারের খরচের হিসাব পরিচালনা করতে লগইন করুন।
+          </p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="p-6 sm:p-8 space-y-5">
+          <div>
+            <label for="loginEmail" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+              <span data-i18n="email_label">ইমেইল ঠিকানা</span> <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input
+                id="loginEmail"
+                type="email"
+                required
+                value="ripanhalder2023@gmail.com"
+                class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm text-slate-900 transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="loginPassword" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
+              <span data-i18n="password_label">পাসওয়ার্ড</span> <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input
+                id="loginPassword"
+                type="password"
+                required
+                value="997722"
+                placeholder="••••••••"
+                class="w-full pl-10 pr-11 py-2.5 sm:py-3 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm text-slate-900 transition"
+              />
+              <button
+                type="button"
+                onclick="togglePasswordVisibility()"
+                aria-label="Toggle Password"
+                class="p-1.5 text-slate-400 hover:text-slate-700 absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg"
+              >
+                <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="loginErrorMsg" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-700"></div>
+
+          <button
+            type="submit"
+            class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition active:scale-[0.99]"
+          >
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            <span data-i18n="login_btn">লগইন করুন</span>
+          </button>
+
+          <p id="loginFooterNote" class="text-center text-[11px] text-slate-400">
+            ব্যক্তিগত পারিবারিক হিসাব পোর্টাল • শুধুমাত্র অনুমোদিত লগইন
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- AUTHENTICATED APPLICATION SHELL                                       -->
+    <!-- =================================================================== -->
+    <div id="appShell" class="hidden space-y-6">
+
+      <!-- Top Summary Metric Cards -->
+      <section id="summaryStatsRow" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-emerald-700 to-teal-800 text-white rounded-2xl p-5 shadow-soft relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span data-i18n="stat_balance" class="text-xs sm:text-sm font-medium text-emerald-100">
+              বর্তমান একাউন্ট ব্যালেন্স
+            </span>
+            <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+              <i data-lucide="wallet" class="w-5 h-5 text-white"></i>
+            </div>
+          </div>
+          <p id="statCurrentBalance" class="text-2xl sm:text-3xl font-bold mt-2.5 tabular-nums">৳০.০০</p>
+          <p id="statBalanceSub" class="text-[11px] text-emerald-200/90 mt-1">
+            ডিপোজিট যুক্ত হয় এবং খরচ স্বয়ংক্রিয়ভাবে বাদ যায়
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/75">
+          <div class="flex items-center justify-between">
+            <span data-i18n="stat_deposits" class="text-xs sm:text-sm font-semibold text-slate-600">
+              মোট ডিপোজিট (ভাইয়ের পাঠানো)
+            </span>
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="arrow-down-left" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="statTotalDeposits" class="text-2xl sm:text-3xl font-bold mt-2.5 tabular-nums text-emerald-700">৳০.০০</p>
+          <p id="statDepositCount" class="text-[11px] text-slate-400 mt-1">০ টি ডিপোজিট এন্ট্রি</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/75">
+          <div class="flex items-center justify-between">
+            <span data-i18n="stat_expenses" class="text-xs sm:text-sm font-semibold text-slate-600">
+              মোট খরচ
+            </span>
+            <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+              <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="statTotalExpenses" class="text-2xl sm:text-3xl font-bold mt-2.5 tabular-nums text-rose-600">৳০.০০</p>
+          <p id="statExpenseCount" class="text-[11px] text-slate-400 mt-1">০ টি খরচ এন্ট্রি</p>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 1: হোম / HOME                                               -->
+      <!-- ================================================================= -->
+      <section id="page-home" class="page-section space-y-6">
+        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70 mb-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span data-i18n="home_badge">হোম ড্যাশবোর্ড</span>
+            </span>
+            <h2 id="homeWelcomeTitle" class="text-xl sm:text-2xl font-bold text-slate-900">
+              স্বাগতম, Ripan Halder
+            </h2>
+            <p id="homeWelcomeDesc" class="text-xs sm:text-sm text-slate-500 mt-1">
+              প্রবাসী ভাইয়ের পাঠানো টাকা ডিপোজিট করুন, প্রতিটি খরচের তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onclick="navigateTo('account')"
+              class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-xs transition active:scale-[0.99]"
+            >
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span data-i18n="quick_deposit">ডিপোজিট যুক্ত করুন</span>
+            </button>
+            <button
+              type="button"
+              onclick="navigateTo('ledger')"
+              class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-xs transition active:scale-[0.99]"
+            >
+              <i data-lucide="receipt-text" class="w-4 h-4"></i>
+              <span data-i18n="quick_expense">খরচ এন্ট্রি করুন</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 data-i18n="recent_activity_title" class="text-base sm:text-lg font-bold text-slate-900">
+                সাম্প্রতিক লেনদেনসমূহ
+              </h3>
+              <p data-i18n="recent_activity_sub" class="text-xs text-slate-500">
+                সর্বশেষ ডিপোজিট ও খরচের তালিকা (এডিট বা আপডেট করা যাবে)
+              </p>
+            </div>
+            <button
+              type="button"
+              onclick="navigateTo('ledger')"
+              class="text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+            >
+              <span data-i18n="view_all_ledger">সব হিসাব দেখুন</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="homeRecentList" class="divide-y divide-slate-100"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 2: একাউন্ট / ACCOUNT                                         -->
+      <!-- ================================================================= -->
+      <section id="page-account" class="page-section hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 h-fit">
+            <div class="flex items-center gap-2.5 mb-4">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="banknote" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h2 data-i18n="deposit_form_title" class="text-base sm:text-lg font-bold text-slate-900">
+                  নতুন ডিপোজিট এন্ট্রি
+                </h2>
+                <p data-i18n="deposit_form_sub" class="text-xs text-slate-500">
+                  ডিপোজিট সেভ করলে একাউন্ট ব্যালেন্সে টাকা যুক্ত হবে
+                </p>
+              </div>
+            </div>
+
+            <form id="depositForm" onsubmit="handleDepositSubmit(event)" class="space-y-4">
+              <div>
+                <label for="depositDate" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_date">তারিখ</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="depositDate"
+                  type="date"
+                  required
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="depositAmount" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_amount">টাকার পরিমাণ</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="depositAmount"
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  required
+                  placeholder="0.00"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm tabular-nums"
+                />
+              </div>
+
+              <div>
+                <label for="depositReference" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_reference">রেফারেন্স / পাঠানোর মাধ্যম</span>
+                </label>
+                <input
+                  id="depositReference"
+                  type="text"
+                  data-i18n-placeholder="ph_deposit_ref"
+                  placeholder="যেমন: ভাইয়ের ব্যাংক ট্রান্সফার / বিকাশ #REF-101"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="depositNote" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_note">বিবরণ / নোট</span>
+                </label>
+                <textarea
+                  id="depositNote"
+                  rows="2"
+                  data-i18n-placeholder="ph_deposit_note"
+                  placeholder="যেমন: প্রবাসী ভাই পরিবারের খরচের জন্য পাঠিয়েছে"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99]"
+              >
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span data-i18n="save_btn">সেভ করুন</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 data-i18n="account_history_title" class="text-base sm:text-lg font-bold text-slate-900">
+                  একাউন্ট ডিপোজিট ও লেনদেন বিবরণী
+                </h3>
+                <p data-i18n="account_history_sub" class="text-xs text-slate-500">
+                  যেকোনো এন্ট্রি এডিট করলে ব্যালেন্স স্বয়ংক্রিয়ভাবে আপডেট হবে
+                </p>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500 bg-slate-50/80">
+                    <th class="py-3 px-3 rounded-tl-xl" data-i18n="field_date">তারিখ</th>
+                    <th class="py-3 px-3" data-i18n="col_type">ধরন</th>
+                    <th class="py-3 px-3" data-i18n="field_reference">রেফারেন্স</th>
+                    <th class="py-3 px-3" data-i18n="field_note">বিবরণ</th>
+                    <th class="py-3 px-3 text-right" data-i18n="field_amount">পরিমাণ</th>
+                    <th class="py-3 px-3 text-center rounded-tr-xl" data-i18n="col_actions">অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="accountTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 3: মাই প্রোফাইল / MY PROFILE (Clean Profile + Photo Only)    -->
+      <!-- ================================================================= -->
+      <section id="page-profile" class="page-section hidden space-y-6">
+        <div class="max-w-2xl mx-auto bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 space-y-5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 data-i18n="profile_card_title" class="text-base sm:text-lg font-bold text-slate-900">
+                মাই প্রোফাইল
+              </h2>
+              <p data-i18n="profile_card_sub" class="text-xs text-slate-500">
+                আপনার ছবি, নাম, ইমেইল ও প্রবাসী ভাইয়ের তথ্য সংরক্ষণ করুন
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
+            <img
+              id="profileAvatarPreview"
+              src="https://placehold.co/120x120/059669/ffffff?text=RH"
+              onerror="this.src='https://placehold.co/120x120/059669/ffffff?text=RH'"
+              alt="User Profile"
+              class="w-20 h-20 rounded-2xl object-cover ring-2 ring-emerald-500/30 shadow-xs shrink-0"
+            />
+            <div class="space-y-2">
+              <p id="profilePhotoLabel" class="text-xs font-semibold text-slate-700">
+                প্রোফাইল ছবি পরিবর্তন করুন
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="cursor-pointer px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border border-slate-300 text-xs font-semibold inline-flex items-center gap-1.5 transition">
+                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                  <span data-i18n="upload_photo_btn">ছবি আপলোড</span>
+                  <input id="profilePhotoInput" type="file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
+                </label>
+                <button
+                  type="button"
+                  onclick="resetProfilePhoto()"
+                  class="px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
+                >
+                  <span data-i18n="reset_photo_btn">ডিফল্ট ছবি</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <form id="profileForm" onsubmit="handleProfileSave(event)" class="space-y-4">
+            <div>
+              <label for="profileName" class="block text-xs font-semibold text-slate-700 mb-1">
+                <span data-i18n="field_full_name">পূর্ণ নাম</span>
+              </label>
+              <input
+                id="profileName"
+                type="text"
+                required
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="profileEmail" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="email_label">ইমেইল ঠিকানা</span>
+                </label>
+                <input
+                  id="profileEmail"
+                  type="email"
+                  required
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label for="profilePhone" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_phone">মোবাইল নম্বর</span>
+                </label>
+                <input
+                  id="profilePhone"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="brotherName" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_brother_name">প্রবাসী ভাইয়ের নাম</span>
+                </label>
+                <input
+                  id="brotherName"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+              <div>
+                <label for="brotherCountry" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_brother_country">প্রবাসী দেশ / শহর</span>
+                </label>
+                <input
+                  id="brotherCountry"
+                  type="text"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="newAccountPassword" class="block text-xs font-semibold text-slate-700 mb-1">
+                <span data-i18n="field_new_password">লগইন পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)</span>
+              </label>
+              <input
+                id="newAccountPassword"
+                type="password"
+                data-i18n-placeholder="ph_new_password"
+                placeholder="নতুন পাসওয়ার্ড দিতে চাইলে লিখুন"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99]"
+            >
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span data-i18n="save_profile_btn">প্রোফাইল সেভ করুন</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- PAGE 4: পরিবারের হিসাব নিকাশ / FAMILY EXPENSE & LEDGER + PDF     -->
+      <!-- ================================================================= -->
+      <section id="page-ledger" class="page-section hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 h-fit">
+            <div class="flex items-center gap-2.5 mb-4">
+              <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i data-lucide="file-plus-2" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h2 data-i18n="expense_form_title" class="text-base sm:text-lg font-bold text-slate-900">
+                  খরচের হিসাব এন্ট্রি
+                </h2>
+                <p data-i18n="expense_form_sub" class="text-xs text-slate-500">
+                  সেভ করলে একাউন্ট থেকে টাকা স্বয়ংক্রিয়ভাবে মাইনাস হবে
+                </p>
+              </div>
+            </div>
+
+            <form id="expenseForm" onsubmit="handleExpenseSubmit(event)" class="space-y-3.5">
+              <div>
+                <label for="expDate" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_date">তারিখ</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="expDate"
+                  type="date"
+                  required
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="expWhere" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_where">কোথায় খরচ করেছি</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="expWhere"
+                  type="text"
+                  required
+                  data-i18n-placeholder="ph_where"
+                  placeholder="যেমন: কাঁচাবাজার / স্থানীয় ফার্মেসি / স্কুল অফিস"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="expForWhom" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_for_whom">কার জন্য খরচ করেছি</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="expForWhom"
+                  type="text"
+                  required
+                  data-i18n-placeholder="ph_for_whom"
+                  placeholder="যেমন: মা / বাবা / ছোট বোন / পুরো পরিবার"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label for="expWhy" class="block text-xs font-semibold text-slate-700 mb-1">
+                  <span data-i18n="field_why">কেন খরচ করেছি</span> <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="expWhy"
+                  type="text"
+                  required
+                  data-i18n-placeholder="ph_why"
+                  placeholder="যেমন: মাসের বাজার / ডাক্তার ও ঔষধ / বিদ্যুৎ বিল"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="expReference" class="block text-xs font-semibold text-slate-700 mb-1">
+                    <span data-i18n="field_reference_short">রেফারেন্স</span>
+                  </label>
+                  <input
+                    id="expReference"
+                    type="text"
+                    data-i18n-placeholder="ph_exp_ref"
+                    placeholder="যেমন: ভাউচার #১২ / ক্যাশ"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm"
+                  />
+                </div>
+                <div>
+                  <label for="expAmount" class="block text-xs font-semibold text-slate-700 mb-1">
+                    <span data-i18n="field_amount">টাকার পরিমাণ</span> <span class="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="expAmount"
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    required
+                    placeholder="0.00"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 outline-none text-sm tabular-nums"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99] mt-1"
+              >
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span data-i18n="save_btn">সেভ করুন</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7 space-y-5">
+            <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-card border border-slate-200/75 space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="calendar-range" class="w-4 h-4 text-emerald-600"></i>
+                  <h3 data-i18n="date_filter_pdf_title" class="text-sm sm:text-base font-bold text-slate-900">
+                    তারিখ বাই তারিখ ফিল্টার ও PDF রিপোর্ট
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onclick="exportDateRangePDF()"
+                  class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold inline-flex items-center gap-2 shadow-xs transition active:scale-[0.99]"
+                >
+                  <i data-lucide="file-down" class="w-4 h-4 text-emerald-400"></i>
+                  <span data-i18n="export_pdf_btn">তারিখ বাই তারিখ PDF</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                <div>
+                  <label for="filterStartDate" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                    <span data-i18n="start_date_label">শুরুর তারিখ</span>
+                  </label>
+                  <input
+                    id="filterStartDate"
+                    type="date"
+                    onchange="renderAllViews()"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-emerald-600"
+                  />
+                </div>
+                <div>
+                  <label for="filterEndDate" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                    <span data-i18n="end_date_label">শেষের তারিখ</span>
+                  </label>
+                  <input
+                    id="filterEndDate"
+                    type="date"
+                    onchange="renderAllViews()"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-emerald-600"
+                  />
+                </div>
+                <div>
+                  <label for="filterType" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                    <span data-i18n="filter_type_label">লেনদেনের ধরন</span>
+                  </label>
+                  <select
+                    id="filterType"
+                    onchange="renderAllViews()"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white outline-none focus:border-emerald-600"
+                  >
+                    <option value="all" data-i18n="opt_all">সব (ডিপোজিট + খরচ)</option>
+                    <option value="expense" data-i18n="opt_expense">শুধুমাত্র খরচ</option>
+                    <option value="deposit" data-i18n="opt_deposit">শুধুমাত্র ডিপোজিট</option>
+                  </select>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onclick="clearDateFilters()"
+                    class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition"
+                  >
+                    <span data-i18n="clear_filter_btn">রিসেট</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-card border border-slate-200/75">
+              <div class="flex items-center justify-between gap-2 mb-4">
+                <h3 data-i18n="full_ledger_title" class="text-base sm:text-lg font-bold text-slate-900">
+                  বিস্তারিত হিসাবের খাতা
+                </h3>
+                <span id="filteredCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                  ০ টি এন্ট্রি
+                </span>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500 bg-slate-50/80">
+                      <th class="py-3 px-2.5 rounded-tl-xl" data-i18n="field_date">তারিখ</th>
+                      <th class="py-3 px-2.5" data-i18n="col_type">ধরন</th>
+                      <th class="py-3 px-2.5" data-i18n="field_where">কোথায় খরচ করেছি</th>
+                      <th class="py-3 px-2.5" data-i18n="field_for_whom">কার জন্য খরচ করেছি</th>
+                      <th class="py-3 px-2.5" data-i18n="field_why">কেন খরচ করেছি</th>
+                      <th class="py-3 px-2.5" data-i18n="field_reference_short">রেফারেন্স</th>
+                      <th class="py-3 px-2.5 text-right" data-i18n="field_amount">পরিমাণ</th>
+                      <th class="py-3 px-2.5 text-center rounded-tr-xl" data-i18n="col_actions">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ledgerTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- EDIT / UPDATE ENTRY MODAL                                             -->
+  <!-- ===================================================================== -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-[2px] p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+        <h3 id="editModalTitle" class="text-base font-bold text-slate-900">এন্ট্রি এডিট ও আপডেট করুন</h3>
+        <button type="button" onclick="closeEditModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="editEntryForm" onsubmit="handleUpdateEntrySubmit(event)" class="p-5 space-y-3.5">
+        <input type="hidden" id="editEntryId" />
+        <input type="hidden" id="editEntryType" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="editDate" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_date">তারিখ</label>
+            <input id="editDate" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+          </div>
+          <div>
+            <label for="editAmount" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_amount">টাকার পরিমাণ</label>
+            <input id="editAmount" type="number" step="0.01" min="1" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm tabular-nums outline-none focus:border-emerald-600" />
+          </div>
+        </div>
+
+        <div id="editExpenseFields" class="space-y-3">
+          <div>
+            <label for="editWhere" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_where">কোথায় খরচ করেছি</label>
+            <input id="editWhere" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="editForWhom" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_for_whom">কার জন্য খরচ করেছি</label>
+              <input id="editForWhom" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+            </div>
+            <div>
+              <label for="editWhy" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_why">কেন খরচ করেছি</label>
+              <input id="editWhy" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+            </div>
+          </div>
+        </div>
+
+        <div id="editDepositFields" class="hidden">
+          <label for="editNote" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_note">বিবরণ / নোট</label>
+          <input id="editNote" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+        </div>
+
+        <div>
+          <label for="editReference" class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="field_reference_short">রেফারেন্স</label>
+          <input id="editReference" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm outline-none focus:border-emerald-600" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">
+            <span data-i18n="cancel_btn">বাতিল</span>
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span data-i18n="update_btn">আপডেট সেভ করুন</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- DELETE CONFIRMATION MODAL                                             -->
+  <!-- ===================================================================== -->
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 backdrop-blur-[2px] p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+        <i data-lucide="trash-2" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h3 id="deleteModalTitle" class="text-base font-bold text-slate-900">এন্ট্রি ডিলিট করবেন?</h3>
+        <p id="deleteModalDesc" class="text-xs sm:text-sm text-slate-500 mt-1">
+          ডিলিট করলে একাউন্ট ব্যালেন্স স্বয়ংক্রিয়ভাবে পুনরায় হিসাব করা হবে।
+        </p>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold">
+          <span data-i18n="cancel_btn">বাতিল</span>
+        </button>
+        <button type="button" onclick="confirmDeleteEntry()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold">
+          <span data-i18n="delete_confirm_btn">ডিলিট করুন</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- DATE-BY-DATE PDF REPORT PREVIEW & PRINT MODAL (A4 Formatted)          -->
+  <!-- ===================================================================== -->
+  <div id="pdfPreviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-[2px] p-2 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-200 my-auto overflow-hidden">
+      <div class="no-print px-4 sm:px-6 py-3.5 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+          <span data-i18n="pdf_modal_title" class="text-sm font-bold">তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="triggerPrintPDF()"
+            class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition"
+          >
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span data-i18n="print_save_pdf_btn">প্রিন্ট / PDF সেভ করুন</span>
+          </button>
+          <button
+            type="button"
+            onclick="closePdfModal()"
+            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+          >
+            <span data-i18n="close_btn">বন্ধ করুন</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="pdfReportPrintArea" class="p-6 sm:p-8 bg-white text-slate-900 space-y-6 max-h-[82vh] overflow-y-auto">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b-2 border-slate-800 pb-4">
+          <div>
+            <h2 id="pdfReportHeading" class="text-xl sm:text-2xl font-bold text-slate-900">
+              পরিবারের হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট
+            </h2>
+            <p id="pdfReportRangeText" class="text-xs sm:text-sm text-slate-600 mt-1">
+              তারিখের পরিসীমা: সকল তারিখ
+            </p>
+            <p id="pdfReportUserMeta" class="text-xs text-slate-500 mt-0.5"></p>
+          </div>
+          <div class="text-left sm:text-right text-xs text-slate-500">
+            <p id="pdfGeneratedDateLabel" class="font-semibold text-slate-700"></p>
+            <p id="pdfCurrencyNote">Currency: BDT (৳)</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <p id="pdfSumDepLabel" class="text-[11px] font-semibold text-slate-500">মোট ডিপোজিট</p>
+            <p id="pdfSumDepVal" class="text-base sm:text-lg font-bold text-emerald-700 tabular-nums mt-0.5">৳০.০০</p>
+          </div>
+          <div>
+            <p id="pdfSumExpLabel" class="text-[11px] font-semibold text-slate-500">মোট খরচ</p>
+            <p id="pdfSumExpVal" class="text-base sm:text-lg font-bold text-rose-600 tabular-nums mt-0.5">৳০.০০</p>
+          </div>
+          <div>
+            <p id="pdfSumBalLabel" class="text-[11px] font-semibold text-slate-500">অবশিষ্ট ব্যালেন্স</p>
+            <p id="pdfSumBalVal" class="text-base sm:text-lg font-bold text-slate-900 tabular-nums mt-0.5">৳০.০০</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse border border-slate-300 text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-800">
+                <th class="border border-slate-300 p-2" data-i18n="field_date">তারিখ</th>
+                <th class="border border-slate-300 p-2" data-i18n="col_type">ধরন</th>
+                <th class="border border-slate-300 p-2" data-i18n="field_where">কোথায় খরচ</th>
+                <th class="border border-slate-300 p-2" data-i18n="field_for_whom">কার জন্য</th>
+                <th class="border border-slate-300 p-2" data-i18n="field_why">কেন খরচ / বিবরণ</th>
+                <th class="border border-slate-300 p-2" data-i18n="field_reference_short">রেফারেন্স</th>
+                <th class="border border-slate-300 p-2 text-right" data-i18n="field_amount">পরিমাণ</th>
+              </tr>
+            </thead>
+            <tbody id="pdfReportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FIREBASE SDK MODULE (Auth + Firestore Sync for ripan-family-ledger)   -->
+  <!-- ===================================================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      deleteDoc,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // আপনার Firebase প্রজেক্টের কনফিগ (apiKey ও measurementId আপনার দিলে এখানে বসাবেন)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "ripan-family-ledger.firebaseapp.com",
+      projectId: "ripan-family-ledger",
+      storageBucket: "ripan-family-ledger.firebasestorage.app",
+      messagingSenderId: "698007584072",
+      appId: "1:698007584072:web:f632ac6e2a4c82d194877d",
+      measurementId: "YOUR_MEASUREMENT_ID_HERE"
+    };
+
+    const hasValidApiKey =
+      firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("YOUR_");
+
+    let fbAuth = null;
+    let fbDb = null;
+
+    if (hasValidApiKey) {
+      try {
+        const fbApp = initializeApp(firebaseConfig);
+        fbAuth = getAuth(fbApp);
+        fbDb = getFirestore(fbApp);
+        window.__FIREBASE_READY__ = true;
+      } catch (err) {
+        console.warn("Firebase init notice:", err);
+        window.__FIREBASE_READY__ = false;
+      }
+    } else {
+      window.__FIREBASE_READY__ = false;
+    }
+
+    window.firebaseBridge = {
+      isReady() {
+        return Boolean(window.__FIREBASE_READY__ && fbAuth && fbDb);
+      },
+      async login(email, password) {
+        if (!this.isReady()) return { ok: false, fallback: true };
+        try {
+          await signInWithEmailAndPassword(fbAuth, email, password);
+          return { ok: true };
+        } catch (err) {
+          return { ok: false, error: err };
+        }
+      },
+      async logout() {
+        if (!this.isReady()) return;
+        try {
+          await signOut(fbAuth);
+        } catch (_) {}
+      },
+      async loadTransactions() {
+        if (!this.isReady()) return null;
+        try {
+          const snap = await getDocs(collection(fbDb, "ripan_family_transactions"));
+          const items = [];
+          snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+          return items;
+        } catch (_) {
+          return null;
+        }
+      },
+      async saveTransaction(entry) {
+        if (!this.isReady() || !entry?.id) return;
+        try {
+          await setDoc(doc(fbDb, "ripan_family_transactions", entry.id), entry);
+        } catch (_) {}
+      },
+      async removeTransaction(id) {
+        if (!this.isReady() || !id) return;
+        try {
+          await deleteDoc(doc(fbDb, "ripan_family_transactions", id));
+        } catch (_) {}
+      },
+      async saveProfile(profileObj) {
+        if (!this.isReady()) return;
+        try {
+          await setDoc(doc(fbDb, "ripan_family_meta", "profile"), profileObj, { merge: true });
+        } catch (_) {}
+      }
+    };
+
+    window.dispatchEvent(new Event("firebase-bridge-ready"));
+  </script>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION JAVASCRIPT                                                -->
+  <!-- ===================================================================== -->
+  <script>
+    const TRANSLATIONS = {
+      bn: {
+        brand_title: 'পরিবারের হিসাব নিকাশ',
+        brand_sub: 'প্রবাসী ভাইয়ের পাঠানো টাকার ও খরচের হিসাব',
+        mode_local: 'লোকাল মোড',
+        mode_firebase: 'ফায়ারবেস লাইভ',
+        nav_home: 'হোম',
+        nav_account: 'একাউন্ট',
+        nav_profile: 'মাই প্রোফাইল',
+        nav_ledger: 'পরিবারের হিসাব নিকাশ',
+        logout_btn: 'লগ আউট',
+        login_title: 'একাউন্টে লগইন করুন',
+        login_subtitle: 'প্রবাসী ভাইয়ের পাঠানো টাকা ও পরিবারের খরচের হিসাব পরিচালনা করতে লগইন করুন।',
+        email_label: 'ইমেইল ঠিকানা',
+        password_label: 'পাসওয়ার্ড',
+        login_btn: 'লগইন করুন',
+        login_footer: 'ব্যক্তিগত পারিবারিক হিসাব পোর্টাল • শুধুমাত্র অনুমোদিত লগইন',
+        stat_balance: 'বর্তমান একাউন্ট ব্যালেন্স',
+        stat_balance_sub: 'ডিপোজিট যুক্ত হয় এবং খরচ স্বয়ংক্রিয়ভাবে বাদ যায়',
+        stat_deposits: 'মোট ডিপোজিট (ভাইয়ের পাঠানো)',
+        stat_expenses: 'মোট খরচ',
+        home_badge: 'হোম ড্যাশবোর্ড',
+        home_welcome_prefix: 'স্বাগতম,',
+        home_welcome_desc: 'প্রবাসী ভাইয়ের পাঠানো টাকা ডিপোজিট করুন, প্রতিটি খরচের তথ্য রেফারেন্সসহ সংরক্ষণ করুন এবং তারিখ অনুযায়ী PDF রিপোর্ট বের করুন।',
+        quick_deposit: 'ডিপোজিট যুক্ত করুন',
+        quick_expense: 'খরচ এন্ট্রি করুন',
+        recent_activity_title: 'সাম্প্রতিক লেনদেনসমূহ',
+        recent_activity_sub: 'সর্বশেষ ডিপোজিট ও খরচের তালিকা (এডিট বা আপডেট করা যাবে)',
+        view_all_ledger: 'সব হিসাব দেখুন',
+        deposit_form_title: 'নতুন ডিপোজিট এন্ট্রি',
+        deposit_form_sub: 'ডিপোজিট সেভ করলে একাউন্ট ব্যালেন্সে টাকা যুক্ত হবে',
+        field_date: 'তারিখ',
+        field_amount: 'টাকার পরিমাণ',
+        field_reference: 'রেফারেন্স / পাঠানোর মাধ্যম',
+        field_reference_short: 'রেফারেন্স',
+        field_note: 'বিবরণ / নোট',
+        ph_deposit_ref: 'যেমন: ভাইয়ের ব্যাংক ট্রান্সফার / বিকাশ #REF-101',
+        ph_deposit_note: 'যেমন: প্রবাসী ভাই পরিবারের খরচের জন্য পাঠিয়েছে',
+        save_btn: 'সেভ করুন',
+        account_history_title: 'একাউন্ট ডিপোজিট ও লেনদেন বিবরণী',
+        account_history_sub: 'যেকোনো এন্ট্রি এডিট করলে ব্যালেন্স স্বয়ংক্রিয়ভাবে আপডেট হবে',
+        col_type: 'ধরন',
+        col_actions: 'অ্যাকশন',
+        type_deposit: 'ডিপোজিট',
+        type_expense: 'খরচ',
+        profile_card_title: 'মাই প্রোফাইল',
+        profile_card_sub: 'আপনার ছবি, নাম, ইমেইল ও প্রবাসী ভাইয়ের তথ্য সংরক্ষণ করুন',
+        profile_photo_label: 'প্রোফাইল ছবি পরিবর্তন করুন',
+        upload_photo_btn: 'ছবি আপলোড',
+        reset_photo_btn: 'ডিফল্ট ছবি',
+        field_full_name: 'পূর্ণ নাম',
+        field_phone: 'মোবাইল নম্বর',
+        field_brother_name: 'প্রবাসী ভাইয়ের নাম',
+        field_brother_country: 'প্রবাসী দেশ / শহর',
+        field_new_password: 'লগইন পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)',
+        ph_new_password: 'নতুন পাসওয়ার্ড দিতে চাইলে লিখুন',
+        save_profile_btn: 'প্রোফাইল সেভ করুন',
+        expense_form_title: 'খরচের হিসাব এন্ট্রি',
+        expense_form_sub: 'সেভ করলে একাউন্ট থেকে টাকা স্বয়ংক্রিয়ভাবে মাইনাস হবে',
+        field_where: 'কোথায় খরচ করেছি',
+        field_for_whom: 'কার জন্য খরচ করেছি',
+        field_why: 'কেন খরচ করেছি',
+        ph_where: 'যেমন: কাঁচাবাজার / ফার্মেসি / স্কুল অফিস',
+        ph_for_whom: 'যেমন: মা / বাবা / ছোট বোন / পরিবার',
+        ph_why: 'যেমন: মাসের বাজার / ঔষধ / বিদ্যুৎ বিল',
+        ph_exp_ref: 'যেমন: ভাউচার #১২ / ক্যাশ',
+        date_filter_pdf_title: 'তারিখ বাই তারিখ ফিল্টার ও PDF রিপোর্ট',
+        export_pdf_btn: 'তারিখ বাই তারিখ PDF',
+        start_date_label: 'শুরুর তারিখ',
+        end_date_label: 'শেষের তারিখ',
+        filter_type_label: 'লেনদেনের ধরন',
+        opt_all: 'সব (ডিপোজিট + খরচ)',
+        opt_expense: 'শুধুমাত্র খরচ',
+        opt_deposit: 'শুধুমাত্র ডিপোজিট',
+        clear_filter_btn: 'রিসেট',
+        full_ledger_title: 'বিস্তারিত হিসাবের খাতা',
+        edit_modal_title: 'এন্ট্রি এডিট ও আপডেট করুন',
+        cancel_btn: 'বাতিল',
+        update_btn: 'আপডেট সেভ করুন',
+        delete_modal_title: 'এন্ট্রি ডিলিট করবেন?',
+        delete_modal_desc: 'ডিলিট করলে একাউন্ট ব্যালেন্স স্বয়ংক্রিয়ভাবে পুনরায় হিসাব করা হবে।',
+        delete_confirm_btn: 'ডিলিট করুন',
+        pdf_modal_title: 'তারিখ বাই তারিখ PDF রিপোর্ট প্রিভিউ',
+        print_save_pdf_btn: 'প্রিন্ট / PDF সেভ করুন',
+        close_btn: 'বন্ধ করুন',
+        pdf_heading: 'পরিবারের হিসাব নিকাশ — তারিখ বাই তারিখ স্টেটমেন্ট',
+        pdf_sum_dep: 'মোট ডিপোজিট',
+        pdf_sum_exp: 'মোট খরচ',
+        pdf_sum_bal: 'অবশিষ্ট ব্যালেন্স',
+        toast_login_ok: 'সফলভাবে লগইন করা হয়েছে!',
+        toast_login_err: 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।',
+        toast_logout_ok: 'আপনি লগ আউট করেছেন।',
+        toast_dep_saved: 'ডিপোজিট সেভ হয়েছে এবং ব্যালেন্স বৃদ্ধি পেয়েছে।',
+        toast_exp_saved: 'খরচ এন্ট্রি সেভ হয়েছে এবং ব্যালেন্স থেকে টাকা মাইনাস হয়েছে।',
+        toast_updated: 'এন্ট্রি সফলভাবে আপডেট করা হয়েছে এবং ব্যালেন্স হিসাব করা হয়েছে।',
+        toast_deleted: 'এন্ট্রি ডিলিট করা হয়েছে।',
+        toast_profile_saved: 'প্রোফাইল তথ্য সেভ হয়েছে।',
+        empty_entries: 'কোনো লেনদেন পাওয়া যায়নি।'
+      },
+      en: {
+        brand_title: 'Family Remittance Ledger',
+        brand_sub: 'Overseas brother remittance & family expense tracker',
+        mode_local: 'Local Mode',
+        mode_firebase: 'Firebase Live',
+        nav_home: 'Home',
+        nav_account: 'Account',
+        nav_profile: 'My Profile',
+        nav_ledger: 'Family Ledger',
+        logout_btn: 'Logout',
+        login_title: 'Sign In to Account',
+        login_subtitle: 'Log in to manage money sent by your overseas brother and track family expenses.',
+        email_label: 'Email Address',
+        password_label: 'Password',
+        login_btn: 'Login',
+        login_footer: 'Personal Family Accounting Portal • Authorized Login Only',
+        stat_balance: 'Current Account Balance',
+        stat_balance_sub: 'Deposits add funds; expenses automatically deduct',
+        stat_deposits: 'Total Deposits (From Brother)',
+        stat_expenses: 'Total Expenses',
+        home_badge: 'Home Dashboard',
+        home_welcome_prefix: 'Welcome,',
+        home_welcome_desc: 'Record deposits sent from abroad, log every expense with where, for whom, why, and reference, and export date-by-date PDF reports.',
+        quick_deposit: 'Add Deposit',
+        quick_expense: 'Add Expense',
+        recent_activity_title: 'Recent Transactions',
+        recent_activity_sub: 'Latest deposits and expenses (click Edit to update any record)',
+        view_all_ledger: 'View Full Ledger',
+        deposit_form_title: 'New Deposit Entry',
+        deposit_form_sub: 'Saving a deposit increases your account balance',
+        field_date: 'Date',
+        field_amount: 'Amount',
+        field_reference: 'Reference / Transfer Channel',
+        field_reference_short: 'Reference',
+        field_note: 'Details / Note',
+        ph_deposit_ref: 'e.g. Bank Transfer / bKash #REF-101',
+        ph_deposit_note: 'e.g. Sent by brother for family expenses',
+        save_btn: 'Save',
+        account_history_title: 'Account Deposits & Transactions',
+        account_history_sub: 'Editing or deleting any entry automatically recalculates balance',
+        col_type: 'Type',
+        col_actions: 'Actions',
+        type_deposit: 'Deposit',
+        type_expense: 'Expense',
+        profile_card_title: 'My Profile',
+        profile_card_sub: 'Manage your photo, profile details, and overseas brother info',
+        profile_photo_label: 'Update Profile Photo',
+        upload_photo_btn: 'Upload Photo',
+        reset_photo_btn: 'Default Avatar',
+        field_full_name: 'Full Name',
+        field_phone: 'Phone Number',
+        field_brother_name: 'Overseas Brother Name',
+        field_brother_country: 'Country / City',
+        field_new_password: 'Change Login Password (Optional)',
+        ph_new_password: 'Enter new password to update',
+        save_profile_btn: 'Save Profile',
+        expense_form_title: 'Expense Entry',
+        expense_form_sub: 'Saving deducts the expense automatically from account balance',
+        field_where: 'Where Spent',
+        field_for_whom: 'For Whom',
+        field_why: 'Why Spent',
+        ph_where: 'e.g. Grocery Market / Pharmacy / School',
+        ph_for_whom: 'e.g. Mother / Father / Sister / Family',
+        ph_why: 'e.g. Monthly groceries / Medicine / Utility bill',
+        ph_exp_ref: 'e.g. Voucher #12 / Cash',
+        date_filter_pdf_title: 'Date-by-Date Filter & PDF Report',
+        export_pdf_btn: 'Date-by-Date PDF',
+        start_date_label: 'Start Date',
+        end_date_label: 'End Date',
+        filter_type_label: 'Transaction Type',
+        opt_all: 'All (Deposits + Expenses)',
+        opt_expense: 'Expenses Only',
+        opt_deposit: 'Deposits Only',
+        clear_filter_btn: 'Reset',
+        full_ledger_title: 'Complete Family Expense & Deposit Ledger',
+        edit_modal_title: 'Edit & Update Entry',
+        cancel_btn: 'Cancel',
+        update_btn: 'Save Update',
+        delete_modal_title: 'Delete this entry?',
+        delete_modal_desc: 'Account balance will be recalculated automatically after deletion.',
+        delete_confirm_btn: 'Delete',
+        pdf_modal_title: 'Date-by-Date PDF Report Preview',
+        print_save_pdf_btn: 'Print / Save PDF',
+        close_btn: 'Close',
+        pdf_heading: 'Family Remittance & Expense Statement — Date-by-Date',
+        pdf_sum_dep: 'Total Deposits',
+        pdf_sum_exp: 'Total Expenses',
+        pdf_sum_bal: 'Net Balance',
+        toast_login_ok: 'Logged in successfully!',
+        toast_login_err: 'Invalid email or password.',
+        toast_logout_ok: 'You have been logged out.',
+        toast_dep_saved: 'Deposit saved and added to account balance.',
+        toast_exp_saved: 'Expense saved and deducted from account balance.',
+        toast_updated: 'Entry updated and balance recalculated.',
+        toast_deleted: 'Entry deleted.',
+        toast_profile_saved: 'Profile saved successfully.',
+        empty_entries: 'No transactions found.'
+      }
+    };
+
+    const DEFAULT_AVATAR = 'https://placehold.co/120x120/059669/ffffff?text=RH';
+    const todayStr = () => new Date().toISOString().split('T')[0];
+
+    const appState = {
+      lang: 'bn',
+      isLoggedIn: false,
+      activePage: 'home',
+      credentials: {
+        email: 'ripanhalder2023@gmail.com',
+        password: '997722'
+      },
+      profile: {
+        name: 'Ripan Halder',
+        email: 'ripanhalder2023@gmail.com',
+        phone: '+880 1700-000000',
+        brotherName: 'প্রবাসী ভাই',
+        brotherCountry: 'Overseas',
+        avatar: DEFAULT_AVATAR
+      },
+      transactions: [
+        {
+          id: 'tx-101',
+          type: 'deposit',
+          date: '2026-11-01',
+          amount: 85000,
+          reference: 'REM-SA-88412 (Bank Transfer)',
+          where: '-',
+          forWhom: '-',
+          why: 'প্রবাসী ভাই নভেম্বরের পারিবারিক খরচ ও জরুরি প্রয়োজনে পাঠিয়েছে',
+          note: 'প্রবাসী ভাই নভেম্বরের পারিবারিক খরচ ও জরুরি প্রয়োজনে পাঠিয়েছে'
+        },
+        {
+          id: 'tx-102',
+          type: 'expense',
+          date: '2026-11-03',
+          amount: 14500,
+          reference: 'VCH-001',
+          where: 'কাঁচাবাজার ও সুপারশপ',
+          forWhom: 'পুরো পরিবার',
+          why: 'মাসের চাল, ডাল, তেল ও নিত্যপ্রয়োজনীয় বাজার',
+          note: 'মাসের চাল, ডাল, তেল ও নিত্যপ্রয়োজনীয় বাজার'
+        },
+        {
+          id: 'tx-103',
+          type: 'expense',
+          date: '2026-11-08',
+          amount: 6200,
+          reference: 'MED-409',
+          where: 'সিটি ফার্মেসি ও ডায়াগনস্টিক',
+          forWhom: 'মা',
+          why: 'ব্লাড প্রেসার ও নিয়মিত মাসিক ঔষধ',
+          note: 'ব্লাড প্রেসার ও নিয়মিত মাসিক ঔষধ'
+        },
+        {
+          id: 'tx-104',
+          type: 'expense',
+          date: '2026-11-15',
+          amount: 8000,
+          reference: 'SCH-221',
+          where: 'সেন্ট্রাল স্কুল অফিস',
+          forWhom: 'ছোট বোন',
+          why: 'নভেম্বর মাসের টিউশন ফি ও পরীক্ষার ফর্ম',
+          note: 'নভেম্বর মাসের টিউশন ফি ও পরীক্ষার ফর্ম'
+        }
+      ],
+      pendingDeleteId: null
+    };
+
+    function refreshModeBadge() {
+      const isLive = Boolean(window.firebaseBridge && window.firebaseBridge.isReady());
+      const dot = document.getElementById('modeBadgeDot');
+      const txt = document.getElementById('modeBadgeText');
+      if (isLive) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        txt.textContent = tText('mode_firebase');
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        txt.textContent = tText('mode_local');
+      }
+    }
+
+    function setLanguage(lang) {
+      appState.lang = lang;
+      const isBn = lang === 'bn';
+      document.documentElement.lang = isBn ? 'bn' : 'en';
+      document.body.classList.toggle('lang-en', !isBn);
+
+      const bnBtn = document.getElementById('langBnBtn');
+      const enBtn = document.getElementById('langEnBtn');
+      if (isBn) {
+        bnBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-emerald-600 text-white shadow-xs';
+        enBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900';
+      } else {
+        enBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-emerald-600 text-white shadow-xs';
+        bnBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900';
+      }
+
+      const t = TRANSLATIONS[lang];
+      document.getElementById('headerBrandTitle').textContent = t.brand_title;
+      document.getElementById('headerBrandSub').textContent = t.brand_sub;
+      refreshModeBadge();
+
+      document.getElementById('loginTitle').textContent = t.login_title;
+      document.getElementById('loginSubtitle').textContent = t.login_subtitle;
+      document.getElementById('loginFooterNote').textContent = t.login_footer;
+
+      document.getElementById('drawerBalanceLabel').textContent = t.stat_balance;
+      document.getElementById('statBalanceSub').textContent = t.stat_balance_sub;
+      document.getElementById('homeWelcomeDesc').textContent = t.home_welcome_desc;
+      document.getElementById('profilePhotoLabel').textContent = t.profile_photo_label;
+      document.getElementById('editModalTitle').textContent = t.edit_modal_title;
+      document.getElementById('deleteModalTitle').textContent = t.delete_modal_title;
+      document.getElementById('deleteModalDesc').textContent = t.delete_modal_desc;
+      document.getElementById('pdfReportHeading').textContent = t.pdf_heading;
+      document.getElementById('pdfSumDepLabel').textContent = t.pdf_sum_dep;
+      document.getElementById('pdfSumExpLabel').textContent = t.pdf_sum_exp;
+      document.getElementById('pdfSumBalLabel').textContent = t.pdf_sum_bal;
+
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[key]) el.placeholder = t[key];
+      });
+
+      updateWelcomeName();
+      renderAllViews();
+    }
+
+    function tText(key) {
+      return TRANSLATIONS[appState.lang][key] || key;
+    }
+
+    function formatMoney(num) {
+      const val = Number(num) || 0;
+      const formatted = Math.abs(val).toLocaleString(appState.lang === 'bn' ? 'bn-BD' : 'en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      return (val < 0 ? '-' : '') + '৳' + formatted;
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('loginEmail').value.trim();
+      const passInput = document.getElementById('loginPassword').value;
+      const errBox = document.getElementById('loginErrorMsg');
+
+      if (!emailInput || !passInput) {
+        errBox.textContent = tText('toast_login_err');
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (window.firebaseBridge && window.firebaseBridge.isReady()) {
+        const res = await window.firebaseBridge.login(emailInput, passInput);
+        if (!res.ok) {
+          errBox.textContent = tText('toast_login_err');
+          errBox.classList.remove('hidden');
+          return;
+        }
+        const cloudItems = await window.firebaseBridge.loadTransactions();
+        if (Array.isArray(cloudItems) && cloudItems.length) {
+          appState.transactions = cloudItems;
+        }
+      } else {
+        if (passInput !== appState.credentials.password) {
+          errBox.textContent = tText('toast_login_err');
+          errBox.classList.remove('hidden');
+          return;
+        }
+      }
+
+      appState.credentials.email = emailInput;
+      appState.profile.email = emailInput;
+      errBox.classList.add('hidden');
+      appState.isLoggedIn = true;
+
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appShell').classList.remove('hidden');
+      document.getElementById('menuToggleBtn').classList.remove('hidden');
+
+      syncProfileToUI();
+      navigateTo('home');
+      showToast(tText('toast_login_ok'), 'success');
+    }
+
+    async function handleLogout() {
+      toggleSidebar(false);
+      if (window.firebaseBridge) {
+        await window.firebaseBridge.logout();
+      }
+      appState.isLoggedIn = false;
+      document.getElementById('appShell').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('menuToggleBtn').classList.add('hidden');
+
+      document.getElementById('loginEmail').value = appState.credentials.email;
+      document.getElementById('loginPassword').value = appState.credentials.password;
+      showToast(tText('toast_logout_ok'), 'info');
+    }
+
+    function togglePasswordVisibility() {
+      const inp = document.getElementById('loginPassword');
+      const isPwd = inp.type === 'password';
+      inp.type = isPwd ? 'text' : 'password';
+      const icon = document.getElementById('eyeIcon');
+      icon.setAttribute('data-lucide', isPwd ? 'eye-off' : 'eye');
+      lucide.createIcons();
+    }
+
+    function toggleSidebar(open) {
+      const overlay = document.getElementById('sidebarOverlay');
+      const drawer = document.getElementById('sidebarDrawer');
+      if (open) {
+        overlay.classList.remove('invisible', 'opacity-0');
+        overlay.classList.add('visible', 'opacity-100');
+        drawer.classList.remove('-translate-x-full');
+        drawer.classList.add('translate-x-0');
+      } else {
+        overlay.classList.remove('visible', 'opacity-100');
+        overlay.classList.add('invisible', 'opacity-0');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('-translate-x-full');
+      }
+    }
+
+    function navigateTo(pageKey) {
+      appState.activePage = pageKey;
+      toggleSidebar(false);
+
+      document.querySelectorAll('.page-section').forEach((sec) => sec.classList.add('hidden'));
+      const activeSec = document.getElementById(`page-${pageKey}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach((btn) => {
+        const isCurrent = btn.getAttribute('data-nav') === pageKey;
+        btn.className = isCurrent
+          ? 'nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition bg-emerald-600 text-white shadow-xs'
+          : 'nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition text-slate-700 hover:bg-slate-100';
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderAllViews();
+    }
+
+    function computeTotals(list = appState.transactions) {
+      let totalDeposits = 0;
+      let totalExpenses = 0;
+      let depositCount = 0;
+      let expenseCount = 0;
+
+      for (const item of list) {
+        const amt = Number(item.amount) || 0;
+        if (item.type === 'deposit') {
+          totalDeposits += amt;
+          depositCount += 1;
+        } else if (item.type === 'expense') {
+          totalExpenses += amt;
+          expenseCount += 1;
+        }
+      }
+
+      return {
+        totalDeposits,
+        totalExpenses,
+        balance: totalDeposits - totalExpenses,
+        depositCount,
+        expenseCount
+      };
+    }
+
+    async function handleDepositSubmit(e) {
+      e.preventDefault();
+      const date = document.getElementById('depositDate').value;
+      const amount = parseFloat(document.getElementById('depositAmount').value);
+      const reference = document.getElementById('depositReference').value.trim() || '-';
+      const note = document.getElementById('depositNote').value.trim() || '-';
+
+      if (!date || isNaN(amount) || amount <= 0) return;
+
+      const newEntry = {
+        id: 'dep-' + Date.now(),
+        type: 'deposit',
+        date,
+        amount,
+        reference,
+        where: '-',
+        forWhom: '-',
+        why: note,
+        note
+      };
+
+      appState.transactions.unshift(newEntry);
+      document.getElementById('depositForm').reset();
+      document.getElementById('depositDate').value = todayStr();
+
+      renderAllViews();
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(newEntry);
+      showToast(tText('toast_dep_saved'), 'success');
+    }
+
+    async function handleExpenseSubmit(e) {
+      e.preventDefault();
+      const date = document.getElementById('expDate').value;
+      const where = document.getElementById('expWhere').value.trim();
+      const forWhom = document.getElementById('expForWhom').value.trim();
+      const why = document.getElementById('expWhy').value.trim();
+      const reference = document.getElementById('expReference').value.trim() || '-';
+      const amount = parseFloat(document.getElementById('expAmount').value);
+
+      if (!date || !where || !forWhom || !why || isNaN(amount) || amount <= 0) return;
+
+      const newEntry = {
+        id: 'exp-' + Date.now(),
+        type: 'expense',
+        date,
+        amount,
+        reference,
+        where,
+        forWhom,
+        why,
+        note: why
+      };
+
+      appState.transactions.unshift(newEntry);
+      document.getElementById('expenseForm').reset();
+      document.getElementById('expDate').value = todayStr();
+
+      renderAllViews();
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(newEntry);
+      showToast(tText('toast_exp_saved'), 'success');
+    }
+
+    function openEditModal(id) {
+      const item = appState.transactions.find((t) => t.id === id);
+      if (!item) return;
+
+      document.getElementById('editEntryId').value = item.id;
+      document.getElementById('editEntryType').value = item.type;
+      document.getElementById('editDate').value = item.date;
+      document.getElementById('editAmount').value = item.amount;
+      document.getElementById('editReference').value = item.reference === '-' ? '' : item.reference;
+
+      const expBox = document.getElementById('editExpenseFields');
+      const depBox = document.getElementById('editDepositFields');
+
+      if (item.type === 'expense') {
+        expBox.classList.remove('hidden');
+        depBox.classList.add('hidden');
+        document.getElementById('editWhere').value = item.where === '-' ? '' : item.where;
+        document.getElementById('editForWhom').value = item.forWhom === '-' ? '' : item.forWhom;
+        document.getElementById('editWhy').value = item.why === '-' ? '' : item.why;
+      } else {
+        expBox.classList.add('hidden');
+        depBox.classList.remove('hidden');
+        document.getElementById('editNote').value = (item.note || item.why || '').replace(/^-$/, '');
+      }
+
+      const modal = document.getElementById('editModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('editModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function handleUpdateEntrySubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editEntryId').value;
+      const type = document.getElementById('editEntryType').value;
+      const idx = appState.transactions.findIndex((t) => t.id === id);
+      if (idx === -1) return;
+
+      const date = document.getElementById('editDate').value;
+      const amount = parseFloat(document.getElementById('editAmount').value);
+      const reference = document.getElementById('editReference').value.trim() || '-';
+
+      if (!date || isNaN(amount) || amount <= 0) return;
+
+      const updated = {
+        ...appState.transactions[idx],
+        date,
+        amount,
+        reference
+      };
+
+      if (type === 'expense') {
+        updated.where = document.getElementById('editWhere').value.trim() || '-';
+        updated.forWhom = document.getElementById('editForWhom').value.trim() || '-';
+        updated.why = document.getElementById('editWhy').value.trim() || '-';
+        updated.note = updated.why;
+      } else {
+        const noteVal = document.getElementById('editNote').value.trim() || '-';
+        updated.note = noteVal;
+        updated.why = noteVal;
+      }
+
+      appState.transactions[idx] = updated;
+      closeEditModal();
+      renderAllViews();
+      if (window.firebaseBridge) await window.firebaseBridge.saveTransaction(updated);
+      showToast(tText('toast_updated'), 'success');
+    }
+
+    function openDeleteModal(id) {
+      appState.pendingDeleteId = id;
+      const modal = document.getElementById('deleteModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+      appState.pendingDeleteId = null;
+      const modal = document.getElementById('deleteModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function confirmDeleteEntry() {
+      const id = appState.pendingDeleteId;
+      if (!id) return;
+
+      appState.transactions = appState.transactions.filter((t) => t.id !== id);
+      closeDeleteModal();
+      renderAllViews();
+      if (window.firebaseBridge) await window.firebaseBridge.removeTransaction(id);
+      showToast(tText('toast_deleted'), 'info');
+    }
+
+    function getFilteredTransactions() {
+      const start = document.getElementById('filterStartDate')?.value || '';
+      const end = document.getElementById('filterEndDate')?.value || '';
+      const typeFilter = document.getElementById('filterType')?.value || 'all';
+
+      return appState.transactions
+        .filter((item) => {
+          if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+          if (start && item.date < start) return false;
+          if (end && item.date > end) return false;
+          return true;
+        })
+        .sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function clearDateFilters() {
+      document.getElementById('filterStartDate').value = '';
+      document.getElementById('filterEndDate').value = '';
+      document.getElementById('filterType').value = 'all';
+      renderAllViews();
+    }
+
+    function renderAllViews() {
+      const totals = computeTotals(appState.transactions);
+
+      document.getElementById('statCurrentBalance').textContent = formatMoney(totals.balance);
+      document.getElementById('drawerBalanceValue').textContent = formatMoney(totals.balance);
+      document.getElementById('statTotalDeposits').textContent = formatMoney(totals.totalDeposits);
+      document.getElementById('statTotalExpenses').textContent = formatMoney(totals.totalExpenses);
+
+      const isBn = appState.lang === 'bn';
+      document.getElementById('statDepositCount').textContent = isBn
+        ? `${totals.depositCount} টি ডিপোজিট এন্ট্রি`
+        : `${totals.depositCount} deposit entries`;
+      document.getElementById('statExpenseCount').textContent = isBn
+        ? `${totals.expenseCount} টি খরচ এন্ট্রি`
+        : `${totals.expenseCount} expense entries`;
+
+      renderHomeRecent();
+      renderAccountTable();
+      renderLedgerTable();
+      lucide.createIcons();
+    }
+
+    function renderHomeRecent() {
+      const container = document.getElementById('homeRecentList');
+      const recent = [...appState.transactions]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 5);
+
+      if (!recent.length) {
+        container.innerHTML = `<p class="py-6 text-center text-sm text-slate-400">${tText('empty_entries')}</p>`;
+        return;
+      }
+
+      container.innerHTML = recent
+        .map((item) => {
+          const isDep = item.type === 'deposit';
+          const badgeCls = isDep
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70'
+            : 'bg-rose-50 text-rose-700 border-rose-200/70';
+          const amtCls = isDep ? 'text-emerald-700' : 'text-rose-600';
+          const sign = isDep ? '+' : '-';
+          const titleText = isDep
+            ? (item.note || item.why || tText('type_deposit'))
+            : `${item.why} (${item.forWhom} • ${item.where})`;
+
+          return `
+            <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="space-y-0.5 min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-xs font-semibold text-slate-500 tabular-nums">${escapeHtml(item.date)}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold border ${badgeCls}">
+                    ${isDep ? tText('type_deposit') : tText('type_expense')}
+                  </span>
+                  <span class="text-[11px] text-slate-400 truncate">${escapeHtml(item.reference || '-')}</span>
+                </div>
+                <p class="text-sm font-medium text-slate-800 truncate">${escapeHtml(titleText)}</p>
+              </div>
+              <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                <span class="text-sm font-bold tabular-nums ${amtCls}">${sign}${formatMoney(item.amount)}</span>
+                <button
+                  type="button"
+                  onclick="openEditModal('${item.id}')"
+                  class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-semibold transition"
+                >
+                  ${appState.lang === 'bn' ? 'এডিট' : 'Edit'}
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function renderAccountTable() {
+      const tbody = document.getElementById('accountTableBody');
+      const list = [...appState.transactions].sort((a, b) => b.date.localeCompare(a.date));
+
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">${tText('empty_entries')}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list
+        .map((item) => {
+          const isDep = item.type === 'deposit';
+          const badge = isDep
+            ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">${tText('type_deposit')}</span>`
+            : `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700">${tText('type_expense')}</span>`;
+          const desc = isDep ? (item.note || item.why || '-') : `${item.why} (${item.where})`;
+
+          return `
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="py-3 px-3 whitespace-nowrap tabular-nums text-slate-600">${escapeHtml(item.date)}</td>
+              <td class="py-3 px-3 whitespace-nowrap">${badge}</td>
+              <td class="py-3 px-3 text-slate-600">${escapeHtml(item.reference || '-')}</td>
+              <td class="py-3 px-3 text-slate-800 max-w-[200px] truncate">${escapeHtml(desc)}</td>
+              <td class="py-3 px-3 text-right font-bold tabular-nums whitespace-nowrap ${isDep ? 'text-emerald-700' : 'text-rose-600'}">
+                ${isDep ? '+' : '-'}${formatMoney(item.amount)}
+              </td>
+              <td class="py-3 px-3 text-center whitespace-nowrap">
+                <div class="inline-flex items-center gap-1">
+                  <button
+                    type="button"
+                    onclick="openEditModal('${item.id}')"
+                    class="p-1.5 rounded-lg text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                  >
+                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="openDeleteModal('${item.id}')"
+                    class="p-1.5 rounded-lg text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function renderLedgerTable() {
+      const tbody = document.getElementById('ledgerTableBody');
+      const filtered = getFilteredTransactions();
+
+      document.getElementById('filteredCountBadge').textContent =
+        appState.lang === 'bn' ? `${filtered.length} টি এন্ট্রি` : `${filtered.length} entries`;
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">${tText('empty_entries')}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map((item) => {
+          const isDep = item.type === 'deposit';
+          const badge = isDep
+            ? `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">${tText('type_deposit')}</span>`
+            : `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700">${tText('type_expense')}</span>`;
+
+          return `
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="py-3 px-2.5 whitespace-nowrap tabular-nums text-slate-600">${escapeHtml(item.date)}</td>
+              <td class="py-3 px-2.5 whitespace-nowrap">${badge}</td>
+              <td class="py-3 px-2.5 text-slate-700">${escapeHtml(item.where || '-')}</td>
+              <td class="py-3 px-2.5 text-slate-700">${escapeHtml(item.forWhom || '-')}</td>
+              <td class="py-3 px-2.5 text-slate-800 font-medium">${escapeHtml(item.why || item.note || '-')}</td>
+              <td class="py-3 px-2.5 text-slate-500">${escapeHtml(item.reference || '-')}</td>
+              <td class="py-3 px-2.5 text-right font-bold tabular-nums whitespace-nowrap ${isDep ? 'text-emerald-700' : 'text-rose-600'}">
+                ${isDep ? '+' : '-'}${formatMoney(item.amount)}
+              </td>
+              <td class="py-3 px-2.5 text-center whitespace-nowrap">
+                <div class="inline-flex items-center gap-1">
+                  <button
+                    type="button"
+                    onclick="openEditModal('${item.id}')"
+                    class="p-1.5 rounded-lg text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition"
+                  >
+                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="openDeleteModal('${item.id}')"
+                    class="p-1.5 rounded-lg text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    function exportDateRangePDF() {
+      const start = document.getElementById('filterStartDate')?.value || '';
+      const end = document.getElementById('filterEndDate')?.value || '';
+      const rows = [...getFilteredTransactions()].sort((a, b) => a.date.localeCompare(b.date));
+      const sum = computeTotals(rows);
+
+      const isBn = appState.lang === 'bn';
+      let rangeLabel = isBn ? 'সকল তারিখ' : 'All Dates';
+      if (start && end) rangeLabel = isBn ? `${start} থেকে ${end}` : `${start} to ${end}`;
+      else if (start) rangeLabel = isBn ? `${start} থেকে পরবর্তী` : `From ${start}`;
+      else if (end) rangeLabel = isBn ? `${end} পর্যন্ত` : `Up to ${end}`;
+
+      document.getElementById('pdfReportRangeText').textContent =
+        (isBn ? 'তারিখের পরিসীমা: ' : 'Date Range: ') + rangeLabel;
+
+      document.getElementById('pdfReportUserMeta').textContent =
+        `${appState.profile.name} (${appState.profile.email}) • ${
+          isBn ? 'প্রবাসী ভাই: ' : 'Brother: '
+        }${appState.profile.brotherName} [${appState.profile.brotherCountry}]`;
+
+      document.getElementById('pdfGeneratedDateLabel').textContent =
+        (isBn ? 'রিপোর্ট তৈরির তারিখ: ' : 'Generated: ') + todayStr();
+
+      document.getElementById('pdfSumDepVal').textContent = formatMoney(sum.totalDeposits);
+      document.getElementById('pdfSumExpVal').textContent = formatMoney(sum.totalExpenses);
+      document.getElementById('pdfSumBalVal').textContent = formatMoney(sum.balance);
+
+      const tbody = document.getElementById('pdfReportTableBody');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="border border-slate-300 p-4 text-center text-slate-500">${tText('empty_entries')}</td></tr>`;
+      } else {
+        tbody.innerHTML = rows
+          .map((item) => {
+            const isDep = item.type === 'deposit';
+            return `
+              <tr>
+                <td class="border border-slate-300 p-2 tabular-nums whitespace-nowrap">${escapeHtml(item.date)}</td>
+                <td class="border border-slate-300 p-2 font-semibold ${isDep ? 'text-emerald-700' : 'text-rose-700'}">
+                  ${isDep ? tText('type_deposit') : tText('type_expense')}
+                </td>
+                <td class="border border-slate-300 p-2">${escapeHtml(item.where || '-')}</td>
+                <td class="border border-slate-300 p-2">${escapeHtml(item.forWhom || '-')}</td>
+                <td class="border border-slate-300 p-2">${escapeHtml(item.why || item.note || '-')}</td>
+                <td class="border border-slate-300 p-2">${escapeHtml(item.reference || '-')}</td>
+                <td class="border border-slate-300 p-2 text-right font-bold tabular-nums whitespace-nowrap">
+                  ${isDep ? '+' : '-'}${formatMoney(item.amount)}
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      const modal = document.getElementById('pdfPreviewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closePdfModal() {
+      const modal = document.getElementById('pdfPreviewModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function triggerPrintPDF() {
+      window.print();
+    }
+
+    function syncProfileToUI() {
+      document.getElementById('profileName').value = appState.profile.name;
+      document.getElementById('profileEmail').value = appState.profile.email;
+      document.getElementById('profilePhone').value = appState.profile.phone;
+      document.getElementById('brotherName').value = appState.profile.brotherName;
+      document.getElementById('brotherCountry').value = appState.profile.brotherCountry;
+      document.getElementById('profileAvatarPreview').src = appState.profile.avatar || DEFAULT_AVATAR;
+      document.getElementById('drawerAvatar').src = appState.profile.avatar || DEFAULT_AVATAR;
+      document.getElementById('drawerUserName').textContent = appState.profile.name;
+      document.getElementById('drawerUserEmail').textContent = appState.profile.email;
+      updateWelcomeName();
+    }
+
+    function updateWelcomeName() {
+      const prefix = TRANSLATIONS[appState.lang].home_welcome_prefix;
+      const el = document.getElementById('homeWelcomeTitle');
+      if (el) el.textContent = `${prefix} ${appState.profile.name}`;
+    }
+
+    function handlePhotoUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const dataUrl = evt.target.result;
+        appState.profile.avatar = dataUrl;
+        document.getElementById('profileAvatarPreview').src = dataUrl;
+        document.getElementById('drawerAvatar').src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetProfilePhoto() {
+      appState.profile.avatar = DEFAULT_AVATAR;
+      document.getElementById('profileAvatarPreview').src = DEFAULT_AVATAR;
+      document.getElementById('drawerAvatar').src = DEFAULT_AVATAR;
+    }
+
+    async function handleProfileSave(e) {
+      e.preventDefault();
+      appState.profile.name = document.getElementById('profileName').value.trim() || appState.profile.name;
+      appState.profile.email = document.getElementById('profileEmail').value.trim() || appState.profile.email;
+      appState.profile.phone = document.getElementById('profilePhone').value.trim();
+      appState.profile.brotherName = document.getElementById('brotherName').value.trim();
+      appState.profile.brotherCountry = document.getElementById('brotherCountry').value.trim();
+      appState.credentials.email = appState.profile.email;
+
+      const newPass = document.getElementById('newAccountPassword').value;
+      if (newPass && newPass.trim().length >= 4) {
+        appState.credentials.password = newPass.trim();
+        document.getElementById('newAccountPassword').value = '';
+      }
+
+      syncProfileToUI();
+      if (window.firebaseBridge) await window.firebaseBridge.saveProfile(appState.profile);
+      showToast(tText('toast_profile_saved'), 'success');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colorMap = {
+        success: 'bg-emerald-900 text-white border-emerald-700',
+        info: 'bg-slate-900 text-white border-slate-700',
+        error: 'bg-rose-900 text-white border-rose-700'
+      };
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-medium flex items-center gap-2 transition ${colorMap[type] || colorMap.info}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-6px)';
+        setTimeout(() => toast.remove(), 220);
+      }, 2800);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    window.addEventListener('firebase-bridge-ready', refreshModeBadge);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = todayStr();
+      document.getElementById('depositDate').value = today;
+      document.getElementById('expDate').value = today;
+      syncProfileToUI();
+      setLanguage('bn');
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
