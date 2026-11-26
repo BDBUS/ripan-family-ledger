@@ -302,7 +302,7 @@
             একাউন্টে লগইন করুন
           </h2>
           <p id="loginSubtitle" class="text-xs sm:text-sm text-emerald-100 mt-1.5 leading-relaxed">
-            আপনার ডিপোজিট, আয় ও খরচের হিসাব ফায়ারবেসে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।
+            যেকোনো ফোন থেকে একই ইমেইল-পাসওয়ার্ডে লগইন করে আপনার ডিপোজিট ও খরচের হিসাব দেখুন।
           </p>
         </div>
 
@@ -367,7 +367,7 @@
           </button>
 
           <p id="loginFooterNote" class="text-center text-[11px] text-slate-400">
-            লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না
+            লাইফটাইম লগইন সক্রিয় • ফায়ারবেস ক্লাউড সিঙ্ক
           </p>
         </form>
       </div>
@@ -1134,7 +1134,7 @@
   </footer>
 
   <!-- ===================================================================== -->
-  <!-- FIREBASE SDK MODULE (Direct Auth + Cloud Firestore CRUD)             -->
+  <!-- FIREBASE SDK MODULE (Cross-Device Firestore Sync by Email Key)       -->
   <!-- ===================================================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -1169,12 +1169,12 @@
 
     let fbAuth = null;
     let fbDb = null;
-    let currentFirebaseUid = null;
 
-    function getUserDocScope(email) {
-      const uidPart = currentFirebaseUid || "guest_uid";
-      const emailPart = String(email || "guest@ledger.local").trim().toLowerCase().replace(/[^a-z0-9]/g, "_");
-      return `users/${uidPart}_${emailPart}`;
+    function getAccountKey(email) {
+      return String(email || "guest@ledger.local")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "_");
     }
 
     try {
@@ -1203,14 +1203,12 @@
         try {
           await setPersistence(fbAuth, browserLocalPersistence);
           const cred = await signInWithEmailAndPassword(fbAuth, email, password);
-          currentFirebaseUid = cred.user?.uid || null;
           window.__FIREBASE_LAST_ERROR__ = "";
           return { ok: true, user: cred.user };
         } catch (err) {
           if (err?.code === "auth/user-not-found" || err?.code === "auth/invalid-credential") {
             try {
               const created = await createUserWithEmailAndPassword(fbAuth, email, password);
-              currentFirebaseUid = created.user?.uid || null;
               window.__FIREBASE_LAST_ERROR__ = "";
               return { ok: true, user: created.user, autoCreated: true };
             } catch (createErr) {
@@ -1223,34 +1221,34 @@
         }
       },
       async logout() {
-        currentFirebaseUid = null;
         if (!this.isReady()) return;
         try {
           await signOut(fbAuth);
         } catch (_) {}
       },
-      async loadUserData(email) {
+      async loadAccountFromCloud(email) {
         if (!this.isReady()) return null;
-        const scope = getUserDocScope(email);
+        const key = getAccountKey(email);
         try {
-          const snap = await getDocs(collection(fbDb, `${scope}/transactions`));
-          const items = [];
-          snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+          const snap = await getDocs(collection(fbDb, "ledger_accounts", key, "transactions"));
+          const transactions = [];
+          snap.forEach((d) => transactions.push({ id: d.id, ...d.data() }));
 
-          const profSnap = await getDoc(doc(fbDb, `${scope}/meta/profile`));
+          const profSnap = await getDoc(doc(fbDb, "ledger_accounts", key, "meta", "profile"));
           const profile = profSnap.exists() ? profSnap.data() : null;
+
           window.__FIREBASE_LAST_ERROR__ = "";
-          return { transactions: items, profile };
+          return { transactions, profile };
         } catch (err) {
           window.__FIREBASE_LAST_ERROR__ = err?.message || String(err);
           return null;
         }
       },
-      async saveTransaction(email, entry) {
+      async saveTransactionToCloud(email, entry) {
         if (!this.isReady() || !entry?.id) return false;
-        const scope = getUserDocScope(email);
+        const key = getAccountKey(email);
         try {
-          await setDoc(doc(fbDb, `${scope}/transactions`, entry.id), entry);
+          await setDoc(doc(fbDb, "ledger_accounts", key, "transactions", entry.id), entry);
           window.__FIREBASE_LAST_ERROR__ = "";
           return true;
         } catch (err) {
@@ -1258,11 +1256,11 @@
           return false;
         }
       },
-      async removeTransaction(email, id) {
+      async deleteTransactionFromCloud(email, id) {
         if (!this.isReady() || !id) return false;
-        const scope = getUserDocScope(email);
+        const key = getAccountKey(email);
         try {
-          await deleteDoc(doc(fbDb, `${scope}/transactions`, id));
+          await deleteDoc(doc(fbDb, "ledger_accounts", key, "transactions", id));
           window.__FIREBASE_LAST_ERROR__ = "";
           return true;
         } catch (err) {
@@ -1270,11 +1268,11 @@
           return false;
         }
       },
-      async saveProfile(email, profileObj) {
+      async saveProfileToCloud(email, profileObj) {
         if (!this.isReady()) return false;
-        const scope = getUserDocScope(email);
+        const key = getAccountKey(email);
         try {
-          await setDoc(doc(fbDb, `${scope}/meta/profile`), profileObj, { merge: true });
+          await setDoc(doc(fbDb, "ledger_accounts", key, "meta", "profile"), profileObj, { merge: true });
           window.__FIREBASE_LAST_ERROR__ = "";
           return true;
         } catch (err) {
@@ -1287,7 +1285,6 @@
     if (fbAuth) {
       onAuthStateChanged(fbAuth, (user) => {
         if (user && user.email) {
-          currentFirebaseUid = user.uid;
           window.dispatchEvent(new CustomEvent("firebase-auth-restored", { detail: { email: user.email } }));
         }
       });
@@ -1297,11 +1294,11 @@
   </script>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION JAVASCRIPT (LIFETIME SESSION + FIREBASE SYNC)             -->
+  <!-- APPLICATION JAVASCRIPT (FIRESTORE-FIRST + OFFLINE BACKUP)           -->
   <!-- ===================================================================== -->
   <script>
     const SESSION_STORAGE_KEY = 'ledger_lifetime_session_v1';
-    const DATA_STORE_PREFIX = 'ledger_public_store_v1_';
+    const BACKUP_STORE_PREFIX = 'ledger_cloud_cache_v1_';
     const DEFAULT_AVATAR = 'https://placehold.co/120x120/059669/ffffff?text=US';
     const todayStr = () => new Date().toISOString().split('T')[0];
 
@@ -1309,7 +1306,7 @@
       bn: {
         brand_title: 'হিসাব নিকাশ',
         brand_sub: 'আয়, ডিপোজিট ও খরচের হিসাব ব্যবস্থাপনা',
-        mode_local: 'লোকাল মোড',
+        mode_local: 'অফলাইন ব্যাকআপ',
         mode_firebase: 'ফায়ারবেস লাইভ',
         nav_home: 'হোম',
         nav_account: 'একাউন্ট (ডিপোজিট)',
@@ -1317,12 +1314,12 @@
         nav_ledger: 'হিসাব নিকাশ ও রিপোর্ট',
         logout_btn: 'লগ আউট',
         login_title: 'একাউন্টে লগইন করুন',
-        login_subtitle: 'আপনার ডিপোজিট, আয় ও খরচের হিসাব ফায়ারবেসে সংরক্ষণ ও রিপোর্ট তৈরি করতে লগইন করুন।',
+        login_subtitle: 'যেকোনো ফোন থেকে একই ইমেইল-পাসওয়ার্ডে লগইন করে আপনার ডিপোজিট ও খরচের হিসাব দেখুন।',
         email_label: 'ইমেইল ঠিকানা',
         password_label: 'পাসওয়ার্ড',
         login_btn: 'লগইন করুন',
         guest_login_btn: 'দ্রুত গেস্ট একাউন্টে প্রবেশ করুন',
-        login_footer: 'লাইফটাইম লগইন সক্রিয় • রিফ্রেশ করলেও লগ আউট হবে না',
+        login_footer: 'লাইফটাইম লগইন সক্রিয় • ফায়ারবেস ক্লাউড সিঙ্ক',
         stat_balance: 'বর্তমান একাউন্ট ব্যালেন্স',
         stat_balance_sub: 'ডিপোজিট যুক্ত হয় এবং খরচ স্বয়ংক্রিয়ভাবে বাদ যায়',
         stat_deposits: 'মোট ডিপোজিট / আয়',
@@ -1398,9 +1395,9 @@
         toast_login_ok: 'সফলভাবে লগইন করা হয়েছে!',
         toast_login_err: 'সঠিক ইমেইল ও পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর)।',
         toast_logout_ok: 'আপনি লগ আউট করেছেন।',
-        toast_dep_saved: 'ডিপোজিট সেভ হয়েছে এবং ব্যালেন্স বৃদ্ধি পেয়েছে।',
-        toast_exp_saved: 'খরচ এন্ট্রি সেভ হয়েছে এবং ব্যালেন্স থেকে টাকা মাইনাস হয়েছে।',
-        toast_updated: 'এন্ট্রি সফলভাবে আপডেট করা হয়েছে এবং ব্যালেন্স হিসাব করা হয়েছে।',
+        toast_dep_saved: 'ডিপোজিট ফায়ারবেসে সেভ হয়েছে এবং ব্যালেন্স বৃদ্ধি পেয়েছে।',
+        toast_exp_saved: 'খরচ ফায়ারবেসে সেভ হয়েছে এবং ব্যালেন্স থেকে টাকা মাইনাস হয়েছে।',
+        toast_updated: 'এন্ট্রি ফায়ারবেসে আপডেট হয়েছে এবং ব্যালেন্স হিসাব করা হয়েছে।',
         toast_deleted: 'এন্ট্রি ডিলিট করা হয়েছে।',
         toast_profile_saved: 'প্রোফাইল তথ্য সেভ হয়েছে।',
         empty_entries: 'কোনো লেনদেন পাওয়া যায়নি।'
@@ -1408,7 +1405,7 @@
       en: {
         brand_title: 'Expense Ledger',
         brand_sub: 'Deposit, income & expense tracking portal',
-        mode_local: 'Local Mode',
+        mode_local: 'Offline Backup',
         mode_firebase: 'Firebase Live',
         nav_home: 'Home',
         nav_account: 'Account (Deposits)',
@@ -1416,12 +1413,12 @@
         nav_ledger: 'Ledger & PDF Report',
         logout_btn: 'Logout',
         login_title: 'Sign In to Account',
-        login_subtitle: 'Log in to save your deposits, funds, and daily expenses to Firebase with instant PDF reports.',
+        login_subtitle: 'Log in from any phone with the same email & password to view synced deposits and expenses.',
         email_label: 'Email Address',
         password_label: 'Password',
         login_btn: 'Login',
         guest_login_btn: 'Continue with Quick Guest Account',
-        login_footer: 'Lifetime Login Enabled • Stays signed in after page refresh',
+        login_footer: 'Lifetime Login Enabled • Firebase Cloud Sync',
         stat_balance: 'Current Account Balance',
         stat_balance_sub: 'Deposits add funds; expenses automatically deduct',
         stat_deposits: 'Total Deposits / Income',
@@ -1497,46 +1494,20 @@
         toast_login_ok: 'Logged in successfully!',
         toast_login_err: 'Please enter a valid email and password (min 6 chars).',
         toast_logout_ok: 'You have been logged out.',
-        toast_dep_saved: 'Deposit saved and added to account balance.',
-        toast_exp_saved: 'Expense saved and deducted from account balance.',
-        toast_updated: 'Entry updated and balance recalculated.',
+        toast_dep_saved: 'Deposit saved to Firebase and added to balance.',
+        toast_exp_saved: 'Expense saved to Firebase and deducted from balance.',
+        toast_updated: 'Entry updated in Firebase and balance recalculated.',
         toast_deleted: 'Entry deleted.',
         toast_profile_saved: 'Profile saved successfully.',
         empty_entries: 'No transactions found.'
       }
     };
 
-    const DEFAULT_TRANSACTIONS = [
-      {
-        id: 'tx-sample-1',
-        type: 'deposit',
-        date: todayStr(),
-        amount: 25000,
-        reference: 'DEP-001',
-        where: '-',
-        forWhom: '-',
-        why: 'প্রারম্ভিক ডিপোজিট / ফান্ড',
-        note: 'প্রারম্ভিক ডিপোজিট / ফান্ড'
-      },
-      {
-        id: 'tx-sample-2',
-        type: 'expense',
-        date: todayStr(),
-        amount: 1200,
-        reference: 'EXP-001',
-        where: 'স্থানীয় বাজার',
-        forWhom: 'পরিবার',
-        why: 'দৈনন্দিন বাজার ও প্রয়োজনীয় সামগ্রী',
-        note: 'দৈনন্দিন বাজার ও প্রয়োজনীয় সামগ্রী'
-      }
-    ];
-
     const appState = {
       lang: 'bn',
       isLoggedIn: false,
       activePage: 'home',
       userEmail: 'guest@ledger.local',
-      passwordMap: {},
       profile: {
         name: 'Guest User',
         email: 'guest@ledger.local',
@@ -1545,33 +1516,32 @@
         location: '',
         avatar: DEFAULT_AVATAR
       },
-      transactions: [...DEFAULT_TRANSACTIONS],
+      transactions: [],
       pendingDeleteId: null
     };
 
-    function getUserStorageKey(email) {
-      const clean = String(email || 'guest@ledger.local').trim().toLowerCase();
-      return DATA_STORE_PREFIX + clean;
+    function getCacheKey(email) {
+      return BACKUP_STORE_PREFIX + String(email || 'guest@ledger.local').trim().toLowerCase();
     }
 
-    function loadUserLocalRecord(email) {
+    function loadCache(email) {
       try {
-        const raw = localStorage.getItem(getUserStorageKey(email));
-        if (!raw) return null;
-        return JSON.parse(raw);
+        const raw = localStorage.getItem(getCacheKey(email));
+        return raw ? JSON.parse(raw) : null;
       } catch (_) {
         return null;
       }
     }
 
-    function saveUserLocalRecord() {
+    function saveCache() {
       try {
-        const payload = {
-          password: appState.passwordMap[appState.userEmail] || '',
-          profile: appState.profile,
-          transactions: appState.transactions
-        };
-        localStorage.setItem(getUserStorageKey(appState.userEmail), JSON.stringify(payload));
+        localStorage.setItem(
+          getCacheKey(appState.userEmail),
+          JSON.stringify({
+            profile: appState.profile,
+            transactions: appState.transactions
+          })
+        );
       } catch (_) {}
     }
 
@@ -1588,58 +1558,48 @@
       } catch (_) {}
     }
 
-    function hydrateUserState(email) {
+    function loadLocalFallback(email) {
       const cleanEmail = String(email || 'guest@ledger.local').trim().toLowerCase();
       appState.userEmail = cleanEmail;
-      const saved = loadUserLocalRecord(cleanEmail);
-
-      if (saved) {
-        if (saved.password) appState.passwordMap[cleanEmail] = saved.password;
-        appState.profile = {
-          name: saved.profile?.name || cleanEmail.split('@')[0],
-          email: cleanEmail,
-          phone: saved.profile?.phone || '',
-          bookTitle: saved.profile?.bookTitle || 'হিসাবের খাতা',
-          location: saved.profile?.location || '',
-          avatar: saved.profile?.avatar || DEFAULT_AVATAR
-        };
-        appState.transactions = Array.isArray(saved.transactions) ? saved.transactions : [...DEFAULT_TRANSACTIONS];
-      } else {
-        appState.profile = {
-          name: cleanEmail.split('@')[0] || 'User',
-          email: cleanEmail,
-          phone: '',
-          bookTitle: 'হিসাবের খাতা',
-          location: '',
-          avatar: DEFAULT_AVATAR
-        };
-        appState.transactions = [...DEFAULT_TRANSACTIONS];
-        saveUserLocalRecord();
-      }
+      const cached = loadCache(cleanEmail);
+      appState.profile = {
+        name: cached?.profile?.name || cleanEmail.split('@')[0] || 'User',
+        email: cleanEmail,
+        phone: cached?.profile?.phone || '',
+        bookTitle: cached?.profile?.bookTitle || 'হিসাবের খাতা',
+        location: cached?.profile?.location || '',
+        avatar: cached?.profile?.avatar || DEFAULT_AVATAR
+      };
+      appState.transactions = Array.isArray(cached?.transactions) ? cached.transactions : [];
     }
 
-    async function syncFromFirebaseIfReady(email) {
-      if (!window.firebaseBridge || !window.firebaseBridge.isReady()) return;
-      const cloudData = await window.firebaseBridge.loadUserData(email);
-      if (!cloudData) return;
+    async function loadFromFirebaseFirst(email) {
+      const cleanEmail = String(email || 'guest@ledger.local').trim().toLowerCase();
+      appState.userEmail = cleanEmail;
 
-      if (Array.isArray(cloudData.transactions) && cloudData.transactions.length) {
-        appState.transactions = cloudData.transactions;
-      } else if (Array.isArray(appState.transactions) && appState.transactions.length) {
-        for (const tx of appState.transactions) {
-          await window.firebaseBridge.saveTransaction(email, tx);
+      if (window.firebaseBridge && window.firebaseBridge.isReady()) {
+        const cloud = await window.firebaseBridge.loadAccountFromCloud(cleanEmail);
+        if (cloud) {
+          appState.transactions = Array.isArray(cloud.transactions) ? cloud.transactions : [];
+          appState.profile = {
+            name: cloud.profile?.name || cleanEmail.split('@')[0] || 'User',
+            email: cleanEmail,
+            phone: cloud.profile?.phone || '',
+            bookTitle: cloud.profile?.bookTitle || 'হিসাবের খাতা',
+            location: cloud.profile?.location || '',
+            avatar: cloud.profile?.avatar || DEFAULT_AVATAR
+          };
+          saveCache();
+          syncProfileToUI();
+          renderAllViews();
+          return true;
         }
       }
 
-      if (cloudData.profile) {
-        appState.profile = { ...appState.profile, ...cloudData.profile, email };
-      } else {
-        await window.firebaseBridge.saveProfile(email, appState.profile);
-      }
-
-      saveUserLocalRecord();
+      loadLocalFallback(cleanEmail);
       syncProfileToUI();
       renderAllViews();
+      return false;
     }
 
     function activateAuthenticatedUI(pageToOpen = 'home') {
@@ -1742,29 +1702,21 @@
         return;
       }
 
-      const existing = loadUserLocalRecord(cleanEmail);
-      if (existing && existing.password && existing.password !== password) {
-        errBox.textContent = tText('toast_login_err');
-        errBox.classList.remove('hidden');
-        return;
-      }
-
-      hydrateUserState(cleanEmail);
-      appState.passwordMap[cleanEmail] = password;
-      saveUserLocalRecord();
-      persistLifetimeSession(true, cleanEmail);
-
       if (window.firebaseBridge && window.firebaseBridge.isReady()) {
         const res = await window.firebaseBridge.login(cleanEmail, password);
-        if (res.ok) {
-          await syncFromFirebaseIfReady(cleanEmail);
-        } else if (res.error) {
-          showToast(res.error.message || 'Firebase Auth notice', 'error');
+        if (!res.ok) {
+          errBox.textContent = res.error?.message || tText('toast_login_err');
+          errBox.classList.remove('hidden');
+          return;
         }
       }
 
       errBox.classList.add('hidden');
+      persistLifetimeSession(true, cleanEmail);
+      loadLocalFallback(cleanEmail);
       activateAuthenticatedUI('home');
+      await loadFromFirebaseFirst(cleanEmail);
+
       if (showWelcomeToast) {
         showToast(tText('toast_login_ok'), 'success');
       }
@@ -1890,13 +1842,13 @@
       };
 
       appState.transactions.unshift(newEntry);
-      saveUserLocalRecord();
+      saveCache();
       document.getElementById('depositForm').reset();
       document.getElementById('depositDate').value = todayStr();
-
       renderAllViews();
+
       if (window.firebaseBridge) {
-        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+        const ok = await window.firebaseBridge.saveTransactionToCloud(appState.userEmail, newEntry);
         if (!ok && window.firebaseBridge.getLastError()) {
           showToast(window.firebaseBridge.getLastError(), 'error');
         }
@@ -1928,13 +1880,13 @@
       };
 
       appState.transactions.unshift(newEntry);
-      saveUserLocalRecord();
+      saveCache();
       document.getElementById('expenseForm').reset();
       document.getElementById('expDate').value = todayStr();
-
       renderAllViews();
+
       if (window.firebaseBridge) {
-        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, newEntry);
+        const ok = await window.firebaseBridge.saveTransactionToCloud(appState.userEmail, newEntry);
         if (!ok && window.firebaseBridge.getLastError()) {
           showToast(window.firebaseBridge.getLastError(), 'error');
         }
@@ -2011,11 +1963,12 @@
       }
 
       appState.transactions[idx] = updated;
-      saveUserLocalRecord();
+      saveCache();
       closeEditModal();
       renderAllViews();
+
       if (window.firebaseBridge) {
-        const ok = await window.firebaseBridge.saveTransaction(appState.userEmail, updated);
+        const ok = await window.firebaseBridge.saveTransactionToCloud(appState.userEmail, updated);
         if (!ok && window.firebaseBridge.getLastError()) {
           showToast(window.firebaseBridge.getLastError(), 'error');
         }
@@ -2042,11 +1995,12 @@
       if (!id) return;
 
       appState.transactions = appState.transactions.filter((t) => t.id !== id);
-      saveUserLocalRecord();
+      saveCache();
       closeDeleteModal();
       renderAllViews();
+
       if (window.firebaseBridge) {
-        const ok = await window.firebaseBridge.removeTransaction(appState.userEmail, id);
+        const ok = await window.firebaseBridge.deleteTransactionFromCloud(appState.userEmail, id);
         if (!ok && window.firebaseBridge.getLastError()) {
           showToast(window.firebaseBridge.getLastError(), 'error');
         }
@@ -2350,9 +2304,9 @@
         appState.profile.avatar = dataUrl;
         document.getElementById('profileAvatarPreview').src = dataUrl;
         document.getElementById('drawerAvatar').src = dataUrl;
-        saveUserLocalRecord();
+        saveCache();
         if (window.firebaseBridge) {
-          await window.firebaseBridge.saveProfile(appState.userEmail, appState.profile);
+          await window.firebaseBridge.saveProfileToCloud(appState.userEmail, appState.profile);
         }
       };
       reader.readAsDataURL(file);
@@ -2362,9 +2316,9 @@
       appState.profile.avatar = DEFAULT_AVATAR;
       document.getElementById('profileAvatarPreview').src = DEFAULT_AVATAR;
       document.getElementById('drawerAvatar').src = DEFAULT_AVATAR;
-      saveUserLocalRecord();
+      saveCache();
       if (window.firebaseBridge) {
-        await window.firebaseBridge.saveProfile(appState.userEmail, appState.profile);
+        await window.firebaseBridge.saveProfileToCloud(appState.userEmail, appState.profile);
       }
     }
 
@@ -2379,20 +2333,13 @@
       appState.profile.bookTitle = document.getElementById('ledgerBookTitle').value.trim();
       appState.profile.location = document.getElementById('userLocation').value.trim();
 
-      const newPass = document.getElementById('newAccountPassword').value;
-      if (newPass && newPass.trim().length >= 6) {
-        appState.passwordMap[nextEmail] = newPass.trim();
-        document.getElementById('newAccountPassword').value = '';
-      } else if (!appState.passwordMap[nextEmail] && appState.passwordMap[oldEmail]) {
-        appState.passwordMap[nextEmail] = appState.passwordMap[oldEmail];
-      }
-
       appState.userEmail = nextEmail;
       persistLifetimeSession(true, nextEmail);
-      saveUserLocalRecord();
+      saveCache();
       syncProfileToUI();
+
       if (window.firebaseBridge) {
-        const ok = await window.firebaseBridge.saveProfile(nextEmail, appState.profile);
+        const ok = await window.firebaseBridge.saveProfileToCloud(nextEmail, appState.profile);
         if (!ok && window.firebaseBridge.getLastError()) {
           showToast(window.firebaseBridge.getLastError(), 'error');
         }
@@ -2431,20 +2378,20 @@
     window.addEventListener('firebase-bridge-ready', async () => {
       refreshModeBadge();
       if (appState.isLoggedIn && appState.userEmail) {
-        await syncFromFirebaseIfReady(appState.userEmail);
+        await loadFromFirebaseFirst(appState.userEmail);
       }
     });
 
     window.addEventListener('firebase-auth-restored', async (evt) => {
       const restoredEmail = evt?.detail?.email;
       if (!restoredEmail) return;
-      hydrateUserState(restoredEmail);
       persistLifetimeSession(true, restoredEmail);
-      await syncFromFirebaseIfReady(restoredEmail);
+      loadLocalFallback(restoredEmail);
       activateAuthenticatedUI(appState.activePage || 'home');
+      await loadFromFirebaseFirst(restoredEmail);
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       const today = todayStr();
       document.getElementById('depositDate').value = today;
       document.getElementById('expDate').value = today;
@@ -2459,9 +2406,10 @@
       setLanguage(initialLang);
 
       if (restoredSession && restoredSession.isLoggedIn && restoredSession.email) {
-        hydrateUserState(restoredSession.email);
+        loadLocalFallback(restoredSession.email);
         document.getElementById('loginEmail').value = restoredSession.email;
         activateAuthenticatedUI('home');
+        await loadFromFirebaseFirst(restoredSession.email);
       } else {
         syncProfileToUI();
       }
