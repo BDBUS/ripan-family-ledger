@@ -99,7 +99,7 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <span id="modeBadge" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/80">
-          <span id="modeBadgeDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="modeBadgeDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="modeBadgeText">Firebase Live</span>
         </span>
 
@@ -492,127 +492,193 @@
         </div>
       </section>
 
-      <!-- PAGE 3: MY PROFILE (WITH REGISTRATION PROFILE & UPDATE BUTTON) -->
+      <!-- PAGE 3: MY PROFILE (MEMBER PROFILE CARD + UPDATE FORM) -->
       <section id="page-profile" class="page-section hidden space-y-6">
-        <div class="max-w-2xl mx-auto bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 space-y-5">
-          <div class="flex items-center justify-between gap-2">
-            <div>
-              <h2 data-i18n="profile_card_title" class="text-base sm:text-lg font-bold text-slate-900">মাই প্রোফাইল (রেজিস্ট্রেশন প্রোফাইল)</h2>
-              <p class="text-xs text-slate-500">রেজিস্ট্রেশনের তথ্য এখানে স্বয়ংক্রিয়ভাবে যুক্ত হয়েছে • পরিবর্তন করে আপডেট করুন</p>
+        <div class="max-w-3xl mx-auto space-y-6">
+
+          <!-- SMART MEMBER PROFILE CARD -->
+          <div class="bg-white rounded-3xl shadow-soft border border-slate-200/80 overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-700 px-6 py-5 text-white flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <i data-lucide="id-card" class="w-5 h-5 text-emerald-200"></i>
+                <span class="text-xs sm:text-sm font-bold tracking-wide uppercase">Member Profile Card • সদস্য পরিচিতি কার্ড</span>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/15 text-emerald-100">
+                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span>Live Verified</span>
+              </span>
             </div>
-            <span id="profileUsernameBadge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">@user</span>
+
+            <div class="p-5 sm:p-7 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                <div class="flex items-center gap-4 min-w-0">
+                  <img id="cardProfileAvatar" src="https://placehold.co/120x120/059669/ffffff?text=US" alt="Member Avatar" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-4 ring-emerald-500/20 shadow-sm shrink-0" />
+                  <div class="min-w-0 space-y-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 id="cardProfileName" class="text-lg sm:text-xl font-bold text-slate-900 truncate">User</h3>
+                      <span id="cardProfileUsername" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">@member</span>
+                    </div>
+                    <p id="cardProfileEmail" class="text-xs sm:text-sm text-slate-600 truncate">user@example.com</p>
+                    <p id="cardProfileBookTitle" class="text-xs font-medium text-emerald-700">হিসাবের খাতা</p>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-900 text-white shrink-0 sm:text-right">
+                  <p class="text-[10px] uppercase tracking-wider text-emerald-300 font-semibold">বর্তমান ব্যালেন্স</p>
+                  <p id="cardProfileBalance" class="text-lg sm:text-xl font-bold tabular-nums mt-0.5">৳০.০০</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <p class="text-[11px] text-slate-400 font-medium">Mobile Number (মোবাইল)</p>
+                  <p id="cardProfilePhone" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <p class="text-[11px] text-slate-400 font-medium">Date of Birth (জন্মতারিখ)</p>
+                  <p id="cardProfileDob" class="font-semibold text-slate-800 mt-0.5 tabular-nums">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <p class="text-[11px] text-slate-400 font-medium">Gender (লিঙ্গ)</p>
+                  <p id="cardProfileGender" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <p class="text-[11px] text-slate-400 font-medium">Country / Region (দেশ)</p>
+                  <p id="cardProfileCountry" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 sm:col-span-2">
+                  <p class="text-[11px] text-slate-400 font-medium">Division / District / City (বিভাগ / জেলা / শহর)</p>
+                  <p id="cardProfileDivision" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 sm:col-span-2 lg:col-span-3">
+                  <p class="text-[11px] text-slate-400 font-medium">Detailed Address (বিস্তারিত ঠিকানা)</p>
+                  <p id="cardProfileAddress" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-            <img id="profileAvatarPreview" src="https://placehold.co/120x120/059669/ffffff?text=US" alt="User Profile" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-emerald-500/30 shrink-0" />
-            <div class="space-y-2">
-              <p class="text-xs font-semibold text-slate-700">প্রোফাইল ছবি পরিবর্তন করুন (সর্বোচ্চ 500KB)</p>
-              <div class="flex flex-wrap items-center gap-2">
-                <label class="cursor-pointer px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-slate-700 border border-slate-300 text-xs font-semibold inline-flex items-center gap-1.5">
-                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
-                  <span>ছবি আপলোড</span>
-                  <input id="profilePhotoInput" type="file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
-                </label>
-                <button type="button" onclick="resetProfilePhoto()" class="px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50">
-                  ডিফল্ট ছবি
-                </button>
+          <!-- PROFILE EDIT & UPDATE CARD -->
+          <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-card border border-slate-200/75 space-y-5">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <h2 data-i18n="profile_card_title" class="text-base sm:text-lg font-bold text-slate-900">প্রোফাইল তথ্য পরিবর্তন ও আপডেট</h2>
+                <p class="text-xs text-slate-500">তথ্য পরিবর্তন করে নিচের আপডেট বাটনে চাপলে সাথে সাথে প্রোফাইল কার্ড ও ফায়ারবেস আপডেট হবে</p>
+              </div>
+              <span id="profileUsernameBadge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">@user</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
+              <img id="profileAvatarPreview" src="https://placehold.co/120x120/059669/ffffff?text=US" alt="User Profile" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-emerald-500/30 shrink-0" />
+              <div class="space-y-2">
+                <p class="text-xs font-semibold text-slate-700">প্রোফাইল ছবি পরিবর্তন করুন (সর্বোচ্চ 500KB)</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <label class="cursor-pointer px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-slate-700 border border-slate-300 text-xs font-semibold inline-flex items-center gap-1.5">
+                    <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                    <span>ছবি আপলোড</span>
+                    <input id="profilePhotoInput" type="file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
+                  </label>
+                  <button type="button" onclick="resetProfilePhoto()" class="px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50">
+                    ডিফল্ট ছবি
+                  </button>
+                </div>
               </div>
             </div>
+
+            <form id="profileForm" onsubmit="handleProfileSave(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="profileName" class="block text-xs font-semibold text-slate-700 mb-1">Full Name (পুরো নাম)</label>
+                  <input id="profileName" type="text" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+                <div>
+                  <label for="profileUsername" class="block text-xs font-semibold text-slate-700 mb-1">Username / Nickname (ইউজারনেম / ডাকনাম)</label>
+                  <input id="profileUsername" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="profileEmail" class="block text-xs font-semibold text-slate-700 mb-1">Email Address (ইমেইল ঠিকানা)</label>
+                  <input id="profileEmail" type="email" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm" />
+                </div>
+                <div>
+                  <label for="profilePhone" class="block text-xs font-semibold text-slate-700 mb-1">Mobile Number (মোবাইল নম্বর)</label>
+                  <input id="profilePhone" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="profileDob" class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth (জন্মতারিখ)</label>
+                  <input id="profileDob" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+                <div>
+                  <label for="profileGender" class="block text-xs font-semibold text-slate-700 mb-1">Gender (লিঙ্গ)</label>
+                  <select id="profileGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                    <option value="">নির্বাচন করুন</option>
+                    <option value="Male (পুরুষ)">Male (পুরুষ)</option>
+                    <option value="Female (মহিলা)">Female (মহিলা)</option>
+                    <option value="Other (অন্যান্য)">Other (অন্যান্য)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="profileCountry" class="block text-xs font-semibold text-slate-700 mb-1">Country / Region (দেশ / অঞ্চল)</label>
+                  <select id="profileCountry" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                    <option value="Bangladesh (বাংলাদেশ)">Bangladesh (বাংলাদেশ)</option>
+                    <option value="India (ভারত)">India (ভারত)</option>
+                    <option value="Saudi Arabia (সৌদি আরব)">Saudi Arabia (সৌদি আরব)</option>
+                    <option value="United Arab Emirates (সংযুক্ত আরব আমিরাত)">United Arab Emirates (সংযুক্ত আরব আমিরাত)</option>
+                    <option value="Malaysia (মালয়েশিয়া)">Malaysia (মালয়েশিয়া)</option>
+                    <option value="United Kingdom (যুক্তরাজ্য)">United Kingdom (যুক্তরাজ্য)</option>
+                    <option value="United States (যুক্তরাষ্ট্র)">United States (যুক্তরাষ্ট্র)</option>
+                    <option value="Other (অন্যান্য দেশ)">Other (অন্যান্য দেশ)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="profileDivisionCity" class="block text-xs font-semibold text-slate-700 mb-1">Division / District / City (বিভাগ / জেলা / শহর)</label>
+                  <select id="profileDivisionCity" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
+                    <option value="">নির্বাচন করুন</option>
+                    <option value="Sylhet — Sunamganj (সিলেট — সুনামগঞ্জ)">Sylhet — Sunamganj (সিলেট — সুনামগঞ্জ)</option>
+                    <option value="Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)">Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)</option>
+                    <option value="Sylhet — Habiganj / Moulvibazar">Sylhet — Habiganj / Moulvibazar</option>
+                    <option value="Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)">Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)</option>
+                    <option value="Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)">Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)</option>
+                    <option value="Chattogram — Chattogram City (চট্টগ্রাম)">Chattogram — Chattogram City (চট্টগ্রাম)</option>
+                    <option value="Rajshahi — Rajshahi City (রাজশাহী)">Rajshahi — Rajshahi City (রাজশাহী)</option>
+                    <option value="Khulna — Khulna City (খুলনা)">Khulna — Khulna City (খুলনা)</option>
+                    <option value="Barishal — Barishal City (বরিশাল)">Barishal — Barishal City (বরিশাল)</option>
+                    <option value="Rangpur — Rangpur City (রংপুর)">Rangpur — Rangpur City (রংপুর)</option>
+                    <option value="Mymensingh — Mymensingh City (ময়মনসিংহ)">Mymensingh — Mymensingh City (ময়মনসিংহ)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="profileAddress" class="block text-xs font-semibold text-slate-700 mb-1">Detailed Address (বিস্তারিত ঠিকানা)</label>
+                <textarea id="profileAddress" rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="ledgerBookTitle" class="block text-xs font-semibold text-slate-700 mb-1">হিসাবের খাতা / গ্রুপের নাম</label>
+                  <input id="ledgerBookTitle" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+                <div>
+                  <label for="userLocation" class="block text-xs font-semibold text-slate-700 mb-1">অতিরিক্ত নোট / শহর</label>
+                  <input id="userLocation" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
+                </div>
+              </div>
+
+              <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>প্রোফাইল আপডেট করুন</span>
+              </button>
+            </form>
           </div>
-
-          <form id="profileForm" onsubmit="handleProfileSave(event)" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="profileName" class="block text-xs font-semibold text-slate-700 mb-1">Full Name (পুরো নাম)</label>
-                <input id="profileName" type="text" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-              <div>
-                <label for="profileUsername" class="block text-xs font-semibold text-slate-700 mb-1">Username / Nickname (ইউজারনেম / ডাকনাম)</label>
-                <input id="profileUsername" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="profileEmail" class="block text-xs font-semibold text-slate-700 mb-1">Email Address (ইমেইল ঠিকানা)</label>
-                <input id="profileEmail" type="email" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm" />
-              </div>
-              <div>
-                <label for="profilePhone" class="block text-xs font-semibold text-slate-700 mb-1">Mobile Number (মোবাইল নম্বর)</label>
-                <input id="profilePhone" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="profileDob" class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth (জন্মতারিখ)</label>
-                <input id="profileDob" type="date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-              <div>
-                <label for="profileGender" class="block text-xs font-semibold text-slate-700 mb-1">Gender (লিঙ্গ)</label>
-                <select id="profileGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
-                  <option value="">নির্বাচন করুন</option>
-                  <option value="Male (পুরুষ)">Male (পুরুষ)</option>
-                  <option value="Female (মহিলা)">Female (মহিলা)</option>
-                  <option value="Other (অন্যান্য)">Other (অন্যান্য)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="profileCountry" class="block text-xs font-semibold text-slate-700 mb-1">Country / Region (দেশ / অঞ্চল)</label>
-                <select id="profileCountry" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
-                  <option value="Bangladesh (বাংলাদেশ)">Bangladesh (বাংলাদেশ)</option>
-                  <option value="India (ভারত)">India (ভারত)</option>
-                  <option value="Saudi Arabia (সৌদি আরব)">Saudi Arabia (সৌদি আরব)</option>
-                  <option value="United Arab Emirates (সংযুক্ত আরব আমিরাত)">United Arab Emirates (সংযুক্ত আরব আমিরাত)</option>
-                  <option value="Malaysia (মালয়েশিয়া)">Malaysia (মালয়েশিয়া)</option>
-                  <option value="United Kingdom (যুক্তরাজ্য)">United Kingdom (যুক্তরাজ্য)</option>
-                  <option value="United States (যুক্তরাষ্ট্র)">United States (যুক্তরাষ্ট্র)</option>
-                  <option value="Other (অন্যান্য দেশ)">Other (অন্যান্য দেশ)</option>
-                </select>
-              </div>
-              <div>
-                <label for="profileDivisionCity" class="block text-xs font-semibold text-slate-700 mb-1">Division / District / City (বিভাগ / জেলা / শহর)</label>
-                <select id="profileDivisionCity" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm bg-white">
-                  <option value="">নির্বাচন করুন</option>
-                  <option value="Sylhet — Sunamganj (সিলেট — সুনামগঞ্জ)">Sylhet — Sunamganj (সিলেট — সুনামগঞ্জ)</option>
-                  <option value="Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)">Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)</option>
-                  <option value="Sylhet — Habiganj / Moulvibazar">Sylhet — Habiganj / Moulvibazar</option>
-                  <option value="Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)">Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)</option>
-                  <option value="Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)">Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)</option>
-                  <option value="Chattogram — Chattogram City (চট্টগ্রাম)">Chattogram — Chattogram City (চট্টগ্রাম)</option>
-                  <option value="Rajshahi — Rajshahi City (রাজশাহী)">Rajshahi — Rajshahi City (রাজশাহী)</option>
-                  <option value="Khulna — Khulna City (খুলনা)">Khulna — Khulna City (খুলনা)</option>
-                  <option value="Barishal — Barishal City (বরিশাল)">Barishal — Barishal City (বরিশাল)</option>
-                  <option value="Rangpur — Rangpur City (রংপুর)">Rangpur — Rangpur City (রংপুর)</option>
-                  <option value="Mymensingh — Mymensingh City (ময়মনসিংহ)">Mymensingh — Mymensingh City (ময়মনসিংহ)</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label for="profileAddress" class="block text-xs font-semibold text-slate-700 mb-1">Detailed Address (বিস্তারিত ঠিকানা)</label>
-              <textarea id="profileAddress" rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="ledgerBookTitle" class="block text-xs font-semibold text-slate-700 mb-1">হিসাবের খাতা / গ্রুপের নাম</label>
-                <input id="ledgerBookTitle" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-              <div>
-                <label for="userLocation" class="block text-xs font-semibold text-slate-700 mb-1">অতিরিক্ত নোট / শহর</label>
-                <input id="userLocation" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 outline-none text-sm" />
-              </div>
-            </div>
-
-            <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-              <span>প্রোফাইল আপডেট করুন</span>
-            </button>
-          </form>
         </div>
       </section>
 
@@ -853,7 +919,7 @@
     <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Sylhet, Sunamganj</p>
   </footer>
 
-  <!-- FIREBASE SDK MODULE (hisab-nikash-ledger) -->
+  <!-- FIREBASE SDK MODULE (LIVE REAL-TIME + EMAIL DOCUMENT ID) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
@@ -870,9 +936,8 @@
       collection,
       doc,
       setDoc,
-      getDoc,
       deleteDoc,
-      getDocs
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -890,18 +955,31 @@
     const fbDb = getFirestore(app);
     setPersistence(fbAuth, browserLocalPersistence).catch(() => {});
 
+    let unsubProfile = null;
+    let unsubTransactions = null;
+
+    function stopLiveListeners() {
+      if (typeof unsubProfile === "function") { unsubProfile(); unsubProfile = null; }
+      if (typeof unsubTransactions === "function") { unsubTransactions(); unsubTransactions = null; }
+    }
+
+    function userDocRefByEmail(email) {
+      return doc(fbDb, "users", email.trim().toLowerCase());
+    }
+
     window.firebaseBridge = {
       getUid() {
         return fbAuth.currentUser?.uid || null;
       },
       async registerMember(payload, password) {
-        const cred = await createUserWithEmailAndPassword(fbAuth, payload.email, password);
+        const cleanEmail = payload.email.trim().toLowerCase();
+        const cred = await createUserWithEmailAndPassword(fbAuth, cleanEmail, password);
         const uid = cred.user.uid;
         const profileData = {
           uid,
           name: payload.name.trim(),
           username: payload.username.trim(),
-          email: payload.email.trim().toLowerCase(),
+          email: cleanEmail,
           phone: payload.phone.trim(),
           dob: payload.dob || "",
           gender: payload.gender || "",
@@ -912,45 +990,77 @@
           bookTitle: "হিসাবের খাতা",
           location: payload.divisionCity || "",
           avatar: payload.avatar || "https://placehold.co/120x120/059669/ffffff?text=US",
+          lastActive: new Date().toISOString(),
           createdAt: new Date().toISOString()
         };
-        await setDoc(doc(fbDb, "users", uid), profileData, { merge: true });
+        await setDoc(userDocRefByEmail(cleanEmail), profileData, { merge: true });
         return { user: cred.user, profile: profileData };
       },
       async loginMember(email, password) {
         await setPersistence(fbAuth, browserLocalPersistence);
-        const cred = await signInWithEmailAndPassword(fbAuth, email, password);
+        const cleanEmail = email.trim().toLowerCase();
+        const cred = await signInWithEmailAndPassword(fbAuth, cleanEmail, password);
+        await setDoc(userDocRefByEmail(cleanEmail), {
+          uid: cred.user.uid,
+          email: cleanEmail,
+          lastActive: new Date().toISOString()
+        }, { merge: true });
         return cred.user;
       },
       async logoutMember() {
+        stopLiveListeners();
         await signOut(fbAuth);
       },
-      async loadUserCloudData(uid, email) {
-        const userDocSnap = await getDoc(doc(fbDb, "users", uid));
-        const txSnap = await getDocs(collection(fbDb, "users", uid, "transactions"));
-        const transactions = [];
-        txSnap.forEach((d) => transactions.push({ id: d.id, ...d.data() }));
+      startLiveSync(uid, email, onLiveUpdate) {
+        stopLiveListeners();
+        const cleanEmail = email.trim().toLowerCase();
+        const uRef = userDocRefByEmail(cleanEmail);
+        const txColRef = collection(fbDb, "users", cleanEmail, "transactions");
 
-        const profile = userDocSnap.exists()
-          ? userDocSnap.data()
-          : { uid, name: email.split("@")[0], username: email.split("@")[0], email, avatar: "https://placehold.co/120x120/059669/ffffff?text=US" };
-
-        return { profile, transactions };
-      },
-      async saveTransactionNow(uid, entry) {
-        await setDoc(doc(fbDb, "users", uid, "transactions", entry.id), {
-          ...entry,
+        let latestProfile = {
           uid,
+          name: cleanEmail.split("@")[0],
+          username: cleanEmail.split("@")[0],
+          email: cleanEmail,
+          avatar: "https://placehold.co/120x120/059669/ffffff?text=US"
+        };
+        let latestTransactions = [];
+
+        unsubProfile = onSnapshot(uRef, (snap) => {
+          if (snap.exists()) {
+            latestProfile = { ...latestProfile, ...snap.data(), email: cleanEmail };
+          }
+          onLiveUpdate({ profile: latestProfile, transactions: latestTransactions });
+        });
+
+        unsubTransactions = onSnapshot(txColRef, (snap) => {
+          const list = [];
+          snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+          latestTransactions = list;
+          onLiveUpdate({ profile: latestProfile, transactions: latestTransactions });
+        });
+      },
+      async saveTransactionNow(_uid, entry, email) {
+        const targetEmail = (email || fbAuth.currentUser?.email || "").trim().toLowerCase();
+        if (!targetEmail) throw new Error("ইমেইল পাওয়া যায়নি");
+        await setDoc(doc(fbDb, "users", targetEmail, "transactions", entry.id), {
+          ...entry,
+          email: targetEmail,
           updatedAt: new Date().toISOString()
         });
       },
-      async deleteTransactionNow(uid, id) {
-        await deleteDoc(doc(fbDb, "users", uid, "transactions", id));
+      async deleteTransactionNow(_uid, id, email) {
+        const targetEmail = (email || fbAuth.currentUser?.email || "").trim().toLowerCase();
+        if (!targetEmail) throw new Error("ইমেইল পাওয়া যায়নি");
+        await deleteDoc(doc(fbDb, "users", targetEmail, "transactions", id));
       },
-      async saveProfileNow(uid, profileObj) {
-        await setDoc(doc(fbDb, "users", uid), {
+      async saveProfileNow(_uid, profileObj) {
+        const targetEmail = (profileObj.email || fbAuth.currentUser?.email || "").trim().toLowerCase();
+        if (!targetEmail) throw new Error("ইমেইল পাওয়া যায়নি");
+        await setDoc(userDocRefByEmail(targetEmail), {
           ...profileObj,
-          uid,
+          email: targetEmail,
+          lastActive: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }, { merge: true });
       }
@@ -1066,7 +1176,7 @@
           <option value="Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)">Sylhet — Sylhet Sadar (সিলেট — সিলেট সদর)</option>
           <option value="Sylhet — Habiganj / Moulvibazar">Sylhet — Habiganj / Moulvibazar</option>
           <option value="Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)">Dhaka — Gazipur / Konabari (ঢাকা — গাজীপুর / কোনাবাড়ী)</option>
-          <option value="Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)">Dhaka — ঢাকা শহর</option>
+          <option value="Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)">Dhaka — Dhaka City (ঢাকা — ঢাকা শহর)</option>
           <option value="Chattogram — Chattogram City (চট্টগ্রাম)">Chattogram — Chattogram City (চট্টগ্রাম)</option>
           <option value="Rajshahi — Rajshahi City (রাজশাহী)">Rajshahi — Rajshahi City (রাজশাহী)</option>
           <option value="Khulna — Khulna City (খুলনা)">Khulna — Khulna City (খুলনা)</option>
@@ -1152,18 +1262,14 @@
           };
 
           const res = await window.firebaseBridge.registerMember(payload, password);
-          appState.uid = res.user.uid;
-          appState.userEmail = email;
           appState.profile = res.profile;
           appState.transactions = [];
           localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: res.user.uid, email }));
-          enterApp('রেজিস্ট্রেশন কনফার্ম! প্রোফাইল তৈরি ও ডাটা ফায়ারবেসে সেভ হয়েছে।');
+          loadCloudAndOpen(res.user.uid, email, 'রেজিস্ট্রেশন কনফার্ম! প্রোফাইল কার্ড তৈরি ও লাইভ ডাটা চালু হয়েছে।');
         } else {
           const user = await window.firebaseBridge.loginMember(email, password);
-          appState.uid = user.uid;
-          appState.userEmail = email;
           localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: user.uid, email }));
-          await loadCloudAndOpen(user.uid, email, 'লগইন সফল হয়েছে!');
+          loadCloudAndOpen(user.uid, email, 'লগইন সফল হয়েছে!');
         }
       } catch (err) {
         errBox.textContent = err.message || 'লগইন বা রেজিস্ট্রেশনে সমস্যা হয়েছে।';
@@ -1171,22 +1277,23 @@
       }
     }
 
-    async function loadCloudAndOpen(uid, email, toastMsg = '') {
-      const cloud = await window.firebaseBridge.loadUserCloudData(uid, email);
+    function loadCloudAndOpen(uid, email, toastMsg = '') {
+      const cleanEmail = email.trim().toLowerCase();
       appState.uid = uid;
-      appState.userEmail = email;
-      appState.profile = { ...appState.profile, ...cloud.profile, email };
-      appState.transactions = cloud.transactions || [];
-      enterApp(toastMsg);
-    }
-
-    function enterApp(toastMsg = '') {
+      appState.userEmail = cleanEmail;
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('appShell').classList.remove('hidden');
       document.getElementById('menuToggleBtn').classList.remove('hidden');
       syncProfileUI();
       navigateTo('home');
       if (toastMsg) showToast(toastMsg, 'success');
+
+      window.firebaseBridge.startLiveSync(uid, cleanEmail, ({ profile, transactions }) => {
+        appState.profile = { ...appState.profile, ...profile, email: cleanEmail };
+        appState.transactions = transactions || [];
+        syncProfileUI();
+        renderAllViews();
+      });
     }
 
     async function handleLogout() {
@@ -1194,6 +1301,7 @@
       localStorage.removeItem(SESSION_KEY);
       await window.firebaseBridge.logoutMember();
       appState.uid = null;
+      appState.userEmail = '';
       document.getElementById('appShell').classList.add('hidden');
       document.getElementById('loginView').classList.remove('hidden');
       document.getElementById('menuToggleBtn').classList.add('hidden');
@@ -1249,7 +1357,7 @@
 
     async function handleDepositSubmit(e) {
       e.preventDefault();
-      if (!appState.uid) return;
+      if (!appState.userEmail) return;
       const entry = {
         id: 'dep-' + Date.now(),
         type: 'deposit',
@@ -1262,11 +1370,9 @@
         note: document.getElementById('depositNote').value.trim() || '-'
       };
       try {
-        await window.firebaseBridge.saveTransactionNow(appState.uid, entry);
-        appState.transactions.unshift(entry);
+        await window.firebaseBridge.saveTransactionNow(appState.uid, entry, appState.userEmail);
         document.getElementById('depositForm').reset();
         document.getElementById('depositDate').value = todayStr();
-        renderAllViews();
         showToast('ডিপোজিট সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
       } catch (err) {
         showToast(err.message || 'সেভ করা যায়নি', 'error');
@@ -1275,7 +1381,7 @@
 
     async function handleExpenseSubmit(e) {
       e.preventDefault();
-      if (!appState.uid) return;
+      if (!appState.userEmail) return;
       const why = document.getElementById('expWhy').value.trim();
       const entry = {
         id: 'exp-' + Date.now(),
@@ -1289,11 +1395,9 @@
         amount: parseFloat(document.getElementById('expAmount').value)
       };
       try {
-        await window.firebaseBridge.saveTransactionNow(appState.uid, entry);
-        appState.transactions.unshift(entry);
+        await window.firebaseBridge.saveTransactionNow(appState.uid, entry, appState.userEmail);
         document.getElementById('expenseForm').reset();
         document.getElementById('expDate').value = todayStr();
-        renderAllViews();
         showToast('খরচ সাথে সাথে ফায়ারবেসে জমা হয়েছে!', 'success');
       } catch (err) {
         showToast(err.message || 'সেভ করা যায়নি', 'error');
@@ -1335,7 +1439,7 @@
 
     async function handleUpdateEntrySubmit(e) {
       e.preventDefault();
-      if (!appState.uid) return;
+      if (!appState.userEmail) return;
       const id = document.getElementById('editEntryId').value;
       const type = document.getElementById('editEntryType').value;
       const idx = appState.transactions.findIndex((t) => t.id === id);
@@ -1360,10 +1464,8 @@
       }
 
       try {
-        await window.firebaseBridge.saveTransactionNow(appState.uid, updated);
-        appState.transactions[idx] = updated;
+        await window.firebaseBridge.saveTransactionNow(appState.uid, updated, appState.userEmail);
         closeEditModal();
-        renderAllViews();
         showToast('ফায়ারবেসে আপডেট সংরক্ষিত হয়েছে।', 'success');
       } catch (err) {
         showToast(err.message || 'আপডেট করা যায়নি', 'error');
@@ -1386,12 +1488,10 @@
 
     async function confirmDeleteEntry() {
       const id = appState.pendingDeleteId;
-      if (!id || !appState.uid) return;
+      if (!id || !appState.userEmail) return;
       try {
-        await window.firebaseBridge.deleteTransactionNow(appState.uid, id);
-        appState.transactions = appState.transactions.filter((t) => t.id !== id);
+        await window.firebaseBridge.deleteTransactionNow(appState.uid, id, appState.userEmail);
         closeDeleteModal();
-        renderAllViews();
         showToast('এন্ট্রি ডিলিট করা হয়েছে।', 'info');
       } catch (err) {
         showToast(err.message || 'ডিলিট করা যায়নি', 'error');
@@ -1421,8 +1521,12 @@
 
     function renderAllViews() {
       const totals = computeTotals(appState.transactions);
-      document.getElementById('statCurrentBalance').textContent = formatMoney(totals.balance);
-      document.getElementById('drawerBalanceValue').textContent = formatMoney(totals.balance);
+      const formattedBal = formatMoney(totals.balance);
+      document.getElementById('statCurrentBalance').textContent = formattedBal;
+      document.getElementById('drawerBalanceValue').textContent = formattedBal;
+      if (document.getElementById('cardProfileBalance')) {
+        document.getElementById('cardProfileBalance').textContent = formattedBal;
+      }
       document.getElementById('statTotalDeposits').textContent = formatMoney(totals.totalDeposits);
       document.getElementById('statTotalExpenses').textContent = formatMoney(totals.totalExpenses);
       document.getElementById('statDepositCount').textContent = `${totals.depositCount} টি ডিপোজিট এন্ট্রি`;
@@ -1579,6 +1683,9 @@
 
     function syncProfileUI() {
       const p = appState.profile || {};
+      const avatarUrl = p.avatar || DEFAULT_AVATAR;
+
+      // Sync Profile Form Fields
       document.getElementById('profileName').value = p.name || '';
       document.getElementById('profileUsername').value = p.username || '';
       document.getElementById('profileEmail').value = p.email || '';
@@ -1591,9 +1698,23 @@
       document.getElementById('ledgerBookTitle').value = p.bookTitle || '';
       document.getElementById('userLocation').value = p.location || '';
 
+      // Sync Member Profile Card
+      document.getElementById('cardProfileAvatar').src = avatarUrl;
+      document.getElementById('cardProfileName').textContent = p.name || 'User';
+      document.getElementById('cardProfileUsername').textContent = p.username ? `@${p.username}` : '@member';
+      document.getElementById('cardProfileEmail').textContent = p.email || '-';
+      document.getElementById('cardProfileBookTitle').textContent = p.bookTitle || 'হিসাবের খাতা';
+      document.getElementById('cardProfilePhone').textContent = p.phone || '-';
+      document.getElementById('cardProfileDob').textContent = p.dob || '-';
+      document.getElementById('cardProfileGender').textContent = p.gender || '-';
+      document.getElementById('cardProfileCountry').textContent = p.country || '-';
+      document.getElementById('cardProfileDivision').textContent = p.divisionCity || '-';
+      document.getElementById('cardProfileAddress').textContent = p.address || p.location || '-';
+
+      // Sync Header, Drawer & Home Welcome
       document.getElementById('profileUsernameBadge').textContent = p.username ? `@${p.username}` : '@member';
-      document.getElementById('profileAvatarPreview').src = p.avatar || DEFAULT_AVATAR;
-      document.getElementById('drawerAvatar').src = p.avatar || DEFAULT_AVATAR;
+      document.getElementById('profileAvatarPreview').src = avatarUrl;
+      document.getElementById('drawerAvatar').src = avatarUrl;
       document.getElementById('drawerUserName').textContent = p.name || 'User';
       document.getElementById('drawerUserEmail').textContent = p.email || '';
       document.getElementById('homeWelcomeTitle').textContent = `স্বাগতম, ${p.name || 'User'}`;
@@ -1601,7 +1722,7 @@
 
     async function handlePhotoUpload(e) {
       const file = e.target.files?.[0];
-      if (!file || !appState.uid) return;
+      if (!file || !appState.userEmail) return;
       if (file.size > MAX_PHOTO_BYTES) {
         e.target.value = '';
         showToast('প্রোফাইল ছবি অবশ্যই 500KB এর কম হতে হবে!', 'error');
@@ -1618,7 +1739,7 @@
     }
 
     async function resetProfilePhoto() {
-      if (!appState.uid) return;
+      if (!appState.userEmail) return;
       appState.profile.avatar = DEFAULT_AVATAR;
       syncProfileUI();
       await window.firebaseBridge.saveProfileNow(appState.uid, appState.profile);
@@ -1627,7 +1748,7 @@
 
     async function handleProfileSave(e) {
       e.preventDefault();
-      if (!appState.uid) return;
+      if (!appState.userEmail) return;
       appState.profile.name = document.getElementById('profileName').value.trim();
       appState.profile.username = document.getElementById('profileUsername').value.trim();
       appState.profile.phone = document.getElementById('profilePhone').value.trim();
@@ -1642,7 +1763,7 @@
       try {
         await window.firebaseBridge.saveProfileNow(appState.uid, appState.profile);
         syncProfileUI();
-        showToast('প্রোফাইল তথ্য ফায়ারবেসে আপডেট হয়েছে।', 'success');
+        showToast('প্রোফাইল কার্ড ও ফায়ারবেস তথ্য আপডেট হয়েছে।', 'success');
       } catch (err) {
         showToast(err.message || 'আপডেট করা যায়নি', 'error');
       }
@@ -1662,15 +1783,15 @@
       return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    window.addEventListener('fb-session-ready', async (evt) => {
+    window.addEventListener('fb-session-ready', (evt) => {
       const { uid, email } = evt.detail;
-      if (!appState.uid) {
+      if (!appState.userEmail) {
         localStorage.setItem(SESSION_KEY, JSON.stringify({ uid, email }));
-        await loadCloudAndOpen(uid, email);
+        loadCloudAndOpen(uid, email);
       }
     });
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('depositDate').value = todayStr();
       document.getElementById('expDate').value = todayStr();
       lucide.createIcons();
@@ -1678,7 +1799,7 @@
       try {
         const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
         if (saved?.uid && saved?.email) {
-          await loadCloudAndOpen(saved.uid, saved.email);
+          loadCloudAndOpen(saved.uid, saved.email);
         }
       } catch (_) {}
     });
